@@ -15,9 +15,7 @@ public:
       for (string str : strs){
         string copy = str;
         sort(copy.begin(), copy.end());
-        vector<string> anagram = anagrams[copy];
-        anagram.push_back(str);
-        anagrams[copy] = anagram;
+        anagrams[copy].push_back(str);
       }
 
       vector<vector<string>> result;
