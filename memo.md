@@ -55,3 +55,28 @@ class Solution:
                 return True
         return False
 ```
+
+# Step2
+
+* 自分ではStep1で書いたコードで読みやすいと思っている.
+* LeetCodeの提出結果によると実行速度が52msで上位51%なので, どこか遅くなっているかも？？
+    * `pos = n - 2 (nはリストの要素数)`の時, fastはslowが追いついてくるまで `n-2`と`n-1`の要素を行き来するが, slowは`n-2`回で到着するのでボトルネックではなさそう.
+    * これ以上早くする方法がわからなかったので回答を確認した.
+        * 結局わからず. pythonだから遅いだけ？
+    
+## 最初に書いたコード(最終的なコード)
+
+Step1との変更点はなし.
+
+```python
+class Solution:
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+        slow = head
+        fast = head
+        while (fast is not None) and (fast.next is not None):
+            slow = slow.next
+            fast = fast.next.next
+            if fast == slow:
+                return True
+        return False
+```
