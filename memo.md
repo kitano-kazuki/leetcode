@@ -80,3 +80,23 @@ class Solution:
                 return True
         return False
 ```
+
+# Step3
+
+* Step2で実行時間に関しての懸念を示したが, 何回も提出していたら上位92%の実行時間になったこともあったのでサーバーの計算リソースの占有状況的な揺れの可能性がある.
+* `fast is not None`は`fast`と同値なので置き換えた.
+
+## 最終的なコード
+
+```python
+class Solution:
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+        slow = head
+        fast = head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            if slow == fast:
+                return True
+        return False
+```
