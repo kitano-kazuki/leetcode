@@ -23,3 +23,8 @@ class Solution:
             head = head.next
         return None
 ```
+
+# Step2
+
+* Step1との変更点はなし.
+* pythonでsetにオブジェクトを追加することができた.
