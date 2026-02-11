@@ -36,3 +36,51 @@ class Solution:
                 cur = cur.next
         return head
 ```
+
+# Step2
+
+* ガベージコレクションが働いているかわからないので,delを明示的に呼ぶ.
+
+## Code2-1
+
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        prev = None
+        cur = head
+        while cur is not None:
+            if prev is not None and prev.val == cur.val:
+                prev.next = cur.next
+                del cur
+                cur = prev.next
+            else:
+                prev = cur
+                cur = cur.next
+        return head
+```
+* コードとしては動いたが以下の不安があった.
+    * `del cur`をした時点で4行目に宣言したcurという変数自体が消えちゃわない？？
+        * その場合は, `cur = prev.next`でcurという局所変数が定義されることになるが, while文のこのループが終わって次のループに行く時には消えてしまうのでは？？
+        * pythonだからガバガバな可能性がある？？？
+        * `del`がそもそも, 変数を消すものではなくて, 変数が参照だった時にその中身を解放するものだったとしたら。。。？
+            * curが一時的にNoneになるだけでコードとしては問題がなくなる
+        * 上記は後で検証するとして, 懸念を払拭したコードを作ろう.
+
+## Code2-2
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        prev = None
+        cur = head
+        while cur is not None:
+            if prev is not None and prev.val == cur.val:
+                to_delete = cur
+                prev.next = cur.next
+                cur = prev.next
+                del to_delete
+            else:
+                prev = cur
+                cur = cur.next
+        return head
+```
+
