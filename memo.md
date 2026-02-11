@@ -158,6 +158,9 @@ class Solution:
         return head
 ```
 
+* ３行目`if head is not None and head.next is not None:`としているが, `if head is None or head.next is None`の時に`return head`で先に処理を終了してもいい気がしてきた.
+    * `head is None`だった時に, 4行目以降のif文が間に挟まって, その後に処理が来ている. if文の中が長いとスクロールに時間がかかりそう.
+
 
 # 調べたいこと
 * ガベージコレクションの動作タイミング
