@@ -93,17 +93,7 @@ class Solution:
     * 実装レベルでは, `head`を基準に先をみる場合は, `head.next`が`not None`である必要があるため`while`の条件式が変わる.
     * `head`を基準に見た場合は, 別の変数を作らなくていい文メモリ的に効率的？？でも一つの参照の値を保持するかどうかだから誤差な気がした.
         * 一つの参照って何bitなんだろうか. => 32bitくらい？？
-            * アドレス空間中から一意に特定できる表現幅ってことだよな.
-            * そもそもオブジェクトや変数ってどこに保存されるんだっけ.
-                * 使う時にレジスタに持ってきて, レジスタが埋まっていたら, ldやstでメモリに退避させてたよな
-                    * st %r1 0(%a1)だっけ
-                * じゃあレジスタに保存され得る大きさしかアドレスって存在しない？？
-                    * いや、複数のレジスタ組み合わせれば無限に表現できるか
-                * メインメモリだっけ. でキャッシュヒットするならldは早いけど, ヒットしなかったら遅いってこと？？？
-                    * ヒットした時は2クロック？
-                    * ヒットしなかったら次のキャッシュを見て(L2), それも無理だったらその次を見て...
-                        * 最後までヒットしなかったらメインメモリを見る？？
-                        * ここら辺は調べたい
+    * 結局, returnするための値としてリストの先頭のアドレスを持っておく必要があるから, メモリ的な差異はなかった.
 * 再帰呼び出しによるアプローチ
     * 先頭を消すかどうか判断して, 消したなら先頭.nextを引数に再帰呼び出しした結果をreturn. 消さなかったら`先頭.next = 再帰呼び出し(先頭.next)`とした上で先頭をreturn.
     * 関数呼び出しはリストの小数分呼ばれそう.
@@ -163,12 +153,21 @@ class Solution:
 
 
 # 調べたいこと
-* ガベージコレクションの動作タイミング
-* pythonのdelの仕組み
+* pythonのdelの仕組み, ガベージコレクションの動作タイミング
+    * [ブログ](https://kazuki.jp.net/archives/430)にまとめた
 * pythonの変数のスコープ
-* ld/stの仕組み
-* キャッシュヒット/ミス時の振る舞い
+    * pythonではwhileやif, forはscopeを形成しない
+    * https://www.reddit.com/r/learnpython/comments/13c5xqp/can_you_access_a_variable_scoped_to_a_while_loop/
 * 参照のbit数
+    * 64bit系のpythonでは64bit
+    * そもそもpythonはintだろうがなんだろうが, オブジェクトが生成され, その参照が変数に入っている.
 * 関数呼び出しのオーバーヘッド
-* stackの上限
-* stackの上限に達した時の振る舞い
+    * pythonでは22ns
+        * コンパイラの最適化が働かない
+            * インライン展開
+            * ループアンローリング
+            * 末尾呼び出し
+        * https://mkennedy.codes/posts/python-numbers-every-programmer-should-know/
+    * C++では3ns程度
+        * https://stackoverflow.com/questions/144993/how-much-overhead-is-there-in-calling-a-function-in-c
+
