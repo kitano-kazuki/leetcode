@@ -84,3 +84,88 @@ class Solution:
         return head
 ```
 
+# Step3
+
+* Leetcodeの解説を見ていると, `prev`ではなく, `head`を基準にその一つ先をみるアプローチがあった. 再帰を使うものもあった.
+* それぞれのアプローチについて詳しく考えてみる.
+* `head`を基準に一つ先をみるアプローチ
+    * 本質的には`prev`を見ているものと変わらない気がする.
+    * 実装レベルでは, `head`を基準に先をみる場合は, `head.next`が`not None`である必要があるため`while`の条件式が変わる.
+    * `head`を基準に見た場合は, 別の変数を作らなくていい文メモリ的に効率的？？でも一つの参照の値を保持するかどうかだから誤差な気がした.
+        * 一つの参照って何bitなんだろうか. => 32bitくらい？？
+            * アドレス空間中から一意に特定できる表現幅ってことだよな.
+            * そもそもオブジェクトや変数ってどこに保存されるんだっけ.
+                * 使う時にレジスタに持ってきて, レジスタが埋まっていたら, ldやstでメモリに退避させてたよな
+                    * st %r1 0(%a1)だっけ
+                * じゃあレジスタに保存され得る大きさしかアドレスって存在しない？？
+                    * いや、複数のレジスタ組み合わせれば無限に表現できるか
+                * メインメモリだっけ. でキャッシュヒットするならldは早いけど, ヒットしなかったら遅いってこと？？？
+                    * ヒットした時は2クロック？
+                    * ヒットしなかったら次のキャッシュを見て(L2), それも無理だったらその次を見て...
+                        * 最後までヒットしなかったらメインメモリを見る？？
+                        * ここら辺は調べたい
+* 再帰呼び出しによるアプローチ
+    * 先頭を消すかどうか判断して, 消したなら先頭.nextを引数に再帰呼び出しした結果をreturn. 消さなかったら`先頭.next = 再帰呼び出し(先頭.next)`とした上で先頭をreturn.
+    * 関数呼び出しはリストの小数分呼ばれそう.
+    * 関数呼び出しのオーバーヘッドはどのくらいか
+        * その関数内で使われている変数をstackに退避して, stack pointer動かす.
+        * stackに退避/復帰する時に, ldやstを使っていたから2clockはかかりそう??
+    * 実行時間の差分が関数のオーバーヘッドということになりそう
+    * 関数呼び出しが多すぎたら, stackの一番上まで到達しちゃう？？？ stackの上の方って何かと競合してたはず. グローバル変数置いてたっけ？そこがオーバーしたらエラーになりそう. どのくらいまで呼び出せるのか. もしエラーにならなかったらどんな影響があるのか. pythonやc++はstackがオーバーすることをどうやって検知するのか.
+
+* 関数呼び出しのオーバーヘッドが十分に無視できるか. 関数呼び出しによるstackの上限はあるのか.
+    * おそらくどちらも大規模計算では考慮する必要があるため再帰呼び出しは良くなさそう.
+
+## Code3-1(prevを使用)
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        prev = None
+        cur = head
+        while cur is not None:
+            if prev is not None and prev.val == cur.val:
+                prev.next = cur.next
+                cur = cur.next
+            else:
+                prev = cur
+                cur = cur.next
+        return head
+```
+
+## Code3-2(headの先をみる)
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        res = head
+        while head and head.next:
+            if head.val == head.next.val:
+                head.next = head.next.next
+            else:
+                head = head.next
+        return res
+```
+
+## Code3-3(再帰呼び出し)
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if head is not None and head.next is not None:
+            if head.val == head.next.val:
+                return self.deleteDuplicates(head.next)
+            else:
+                head.next = self.deleteDuplicates(head.next)
+                return head
+        return head
+```
+
+
+# 調べたいこと
+* ガベージコレクションの動作タイミング
+* pythonのdelの仕組み
+* pythonの変数のスコープ
+* ld/stの仕組み
+* キャッシュヒット/ミス時の振る舞い
+* 参照のbit数
+* 関数呼び出しのオーバーヘッド
+* stackの上限
+* stackの上限に達した時の振る舞い
