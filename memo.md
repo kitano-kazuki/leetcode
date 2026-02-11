@@ -10,6 +10,7 @@
     * ガベージコレクションがいつ働くかだけど, どのオブジェクトもnextとして指していない, かつ, その値がどこにも使われていなくなった瞬間にガベージコレクションが働くのかな？？？
     * 関数呼び出しが終わった後にガベージコレクションが働きそう???. 毎回チェックしていたらオーバーヘッドかかかる？ でも, 各オブジェクトが参照されている数を変数として持っておけば, それが0になった時に削除するだけか. C++とかそういう実装だったような気がするが, あまり自信がないな.
     * 明示的にdelを読んだ方が親切な気がする.
+        * (後から補足, delの有無は関係なかった)
 * 計算時間は, リストの長さ文.
 * 外部メモリは, 一個前のノードの参照を保持する分だけ使用.
 * 終わり際の処理を考えたい. .nextがNoneの時.
@@ -40,6 +41,7 @@ class Solution:
 # Step2
 
 * ガベージコレクションが働いているかわからないので,delを明示的に呼ぶ.
+    * (後から補足: del curをしたところで, curという名前が使われなくなるだけ. curが指すオブジェクトを削除したいという意図でdelをしたが, `cur = prev.next`にした時点で元々curが指していたオブジェクトが誰からも参照されなくなるので自動でオブジェクトは削除される. whileループはpythonの場合新たにスコープを作らないので, delの後の`cur = prev.next`で新たにcur変数が宣言されて, 次のloopで使われているだけ.)
 
 ## Code2-1
 
@@ -101,7 +103,6 @@ class Solution:
         * その関数内で使われている変数をstackに退避して, stack pointer動かす.
         * stackに退避/復帰する時に, ldやstを使っていたから2clockはかかりそう??
     * 実行時間の差分が関数のオーバーヘッドということになりそう
-    * 関数呼び出しが多すぎたら, stackの一番上まで到達しちゃう？？？ stackの上の方って何かと競合してたはず. グローバル変数置いてたっけ？そこがオーバーしたらエラーになりそう. どのくらいまで呼び出せるのか. もしエラーにならなかったらどんな影響があるのか. pythonやc++はstackがオーバーすることをどうやって検知するのか.
 
 * 関数呼び出しのオーバーヘッドが十分に無視できるか. 関数呼び出しによるstackの上限はあるのか.
     * おそらくどちらも大規模計算では考慮する必要があるため再帰呼び出しは良くなさそう.
@@ -155,6 +156,7 @@ class Solution:
 # 調べたいこと
 * pythonのdelの仕組み, ガベージコレクションの動作タイミング
     * [ブログ](https://kazuki.jp.net/archives/430)にまとめた
+    * 今回の問題では, delの有無は関係なかった
 * pythonの変数のスコープ
     * pythonではwhileやif, forはscopeを形成しない
     * https://www.reddit.com/r/learnpython/comments/13c5xqp/can_you_access_a_variable_scoped_to_a_while_loop/
@@ -170,4 +172,5 @@ class Solution:
         * https://mkennedy.codes/posts/python-numbers-every-programmer-should-know/
     * C++では3ns程度
         * https://stackoverflow.com/questions/144993/how-much-overhead-is-there-in-calling-a-function-in-c
+    * 関数を呼びすぎると, stackポインタがheap領域に突入するためエラーになる.
 
