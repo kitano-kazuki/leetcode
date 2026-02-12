@@ -113,3 +113,89 @@ class Solution:
             delete_end = delete_end.next
         return self.deleteDuplicates(delete_end)
 ```
+
+# Step3
+
+* ３回実装する中でこうしたらわかりやすいかもという風に少しずつコードが変わっていった.
+
+## １回目
+
+* `unique_candidate`は, `unique`の一個先と二個先が等しい場合に考えたいもの. 
+* そうではない場合は, `unique.next`がユニークなことが確定するので, 早めに処理を切り上げる.
+
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        dummy_start = ListNode()
+        dummy_start.next = head
+        unique = dummy_start
+        while unique.next is not None:
+            if unique.next.next is None:
+                return dummy_start.next
+            if unique.next.val != unique.next.next.val:
+                unique = unique.next
+                continue
+            unique_candidate = unique.next
+            duplication_val = unique_candidate.val
+            while unique_candidate is not None and unique_candidate.val == duplication_val:
+                unique_candidate = unique_candidate.next
+            unique.next = unique_candidate
+        return dummy_start.next
+```
+
+## ２回目
+
+* `duplication_val`を`unique_candidate.val`にするのは直感に反していた.
+    * ユニークな候補なはずなのに, その数字がかぶっている数字とするのは変.
+    * `duplication_val = unique.next.val`とした.
+        * `unique.next`は必ず重複するノードであることが`if`文の条件からわかるのでこっちの方が直感的.
+
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        dummy_start = ListNode()
+        dummy_start.next = head
+        unique = dummy_start
+        while unique.next is not None:
+            if unique.next.next is None:
+                return dummy_start.next
+            if unique.next.val != unique.next.next.val:
+                unique = unique.next
+                continue
+            duplication_val = unique.next.val
+            unique_candidate = unique.next.next
+            while unique_candidate is not None and unique_candidate.val == duplication_val:
+                unique_candidate = unique_candidate.next
+            unique.next = unique_candidate
+        return dummy_start.next
+```
+
+## ３回目
+
+* `unique_candidate`文字通りユニークになり得るのは, `unique.next.next.next`から.
+    * `.next`が複数続くのは少し違和感があったが, こっちの方が変数の意味に合致している
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        dummy_head = ListNode()
+        dummy_head.next = head
+        unique = dummy_head
+        while unique.next:
+            if unique.next.next is None:
+                return dummy_head.next
+            if unique.next.val != unique.next.next.val:
+                unique = unique.next
+                continue
+            duplicated_val = unique.next.val
+            unique_candidate = unique.next.next.next
+            while unique_candidate is not None and unique_candidate.val == duplicated_val:
+                unique_candidate = unique_candidate.next
+            unique.next = unique_candidate
+        return dummy_head.next
+```
