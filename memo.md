@@ -25,6 +25,9 @@
 ## Code1-1 (two poitner)
 
 * 汚いのでstep2で修正する.
+    * is not Noneの判定が多すぎる.
+        * processed_end is not Noneっていらなくねとは書いてて思ったからstep2で吟味.
+    * .nextが基準になっているのをずらせないか検討したい.
 
 ```python
 class Solution:
@@ -45,6 +48,56 @@ class Solution:
 ```
 
 ## Code1-2 (recursion)
+
+* two poiterに比べて見やすいコードになった.
+    * self.deleteDuplicates(None) -> Noneだが, 読む人からするとこのケースが考慮されているかわかりにくいかも？？
+
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if head is None or head.next is None:
+            return head
+        if head.val != head.next.val:
+            head.next = self.deleteDuplicates(head.next)
+            return head
+        delete_start = head
+        delete_end = head.next
+        while delete_end is not None and delete_end.val == delete_start.val:
+            delete_end = delete_end.next
+        return self.deleteDuplicates(delete_end)
+```
+
+# Step2
+
+## Code2-1
+
+* `processed_end`を`unique`にした.
+* 他の人を見る限り`dummy`は結局使わないと難しそう.
+* `unique_candidate = unique.next`とすることで, 注目している基準を`unique`の次のノードにした.
+    * `.next.next`が出現しなくて良くなった.
+* `unique`が更新されるのは, `unique = unique.next`だけだが, `while`文の条件より, `unqiue.next`は`None`でないことが保証されている. `while`の条件式に`unique is not None`は不要になるが, 読み手からはわかりづらい？？？でもいい書き方がわからなかったので保留.
+
+```python
+class Solution:
+    def deleteDuplicates(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        dummy_start = ListNode()
+        dummy_start.next = head
+        unique = dummy_start
+        while unique.next is not None:
+            unique_candidate = unique.next
+            if unique_candidate.next is None or unique_candidate.val != unique_candidate.next.val:
+                unique = unique.next
+            else:
+                duplication_val = unique_candidate.val
+                while unique_candidate is not None and unique_candidate.val == duplication_val:
+                    unique_candidate = unique_candidate.next
+                unique.next = unique_candidate
+        return dummy_start.next
+```
+
+## Code2-2
+
+* Code1-2から変更なし
 
 ```python
 class Solution:
