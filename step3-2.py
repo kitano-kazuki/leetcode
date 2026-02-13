@@ -6,9 +6,9 @@ class Solution:
             "{" : "}",
             "[" : "]"
         }
-        open_brackets = bracket_pairs.keys()
+        open_brakets = bracket_pairs.keys()
         for i in range(len(s)):
-            if s[i] in open_brackets:
+            if s[i] in open_brakets:
                 unclosed_open_brackets.append(s[i])
                 continue
             if len(unclosed_open_brackets) == 0:
