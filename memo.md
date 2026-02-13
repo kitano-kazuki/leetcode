@@ -124,3 +124,34 @@ class Solution:
         return self._addTwoNumbers(l1, l2, 0)
         
 ```
+
+# Step2
+
+## Code2-1
+
+* `node2.next is None`の時に, `node2.next`をリスト１の余剰分の開始点に変更することでループを１つで済むようにした.
+* `tail`は常に`node2`の一つ前を指すようにしているが, 結局使うのは一番最後の`carry`を元にしたノードの追加の時だけ.
+    * 毎回保存しているの勿体無い気がするけど, 最後だけ保存するためにわざわざ`if`文を書くのも読みにくくなる気がした
+
+```python
+class Solution:
+    def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
+        node1 = l1
+        node2 = l2
+        carry = 0
+        tail = None
+        while node2 is not None:
+            node1_value = node1.val if node1 is not None else 0
+            summed_value = node1_value + node2.val + carry
+            node2.val = summed_value % 10
+            carry = summed_value // 10
+            node1 = node1.next if node1 is not None else None
+            if node2.next is None:
+                node2.next = node1
+                node1 = None
+            tail = node2
+            node2 = node2.next
+        if carry != 0:
+            tail.next = ListNode(carry)
+        return l2
+```
