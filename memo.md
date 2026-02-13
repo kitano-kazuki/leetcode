@@ -156,3 +156,59 @@ class Solution:
         return True
 
 ```
+
+# Step4/5
+
+* 再帰降下法の実装をした.
+    * [参考](https://docs.google.com/document/d/11HV35ADPo9QxJOpJQ24FcZvtvioli770WWdZZDaLOfg/edit?tab=t.0#heading=h.5ynll0rwu02h)
+* 自然言語で解釈をちゃんとできたらバグなく実装できた.
+* ただ, `nonlocal`な変数として処理をしている`idx`を持つのは初見だと思いつかなさそう.
+* 自然言語での動作の説明
+    * `check_chunk_valid`は, 先頭の開きかっこから始まって対応する閉じ括弧まで(以降はchunkと呼ぶ)が有効かどうかを判定する関数.
+    * chunkのなかは, 複数のchunkで構成されることもあるし, 単一のchunkであることもあるし, 何もないこともある
+        * それぞれの具体例
+            * ( () [] {} )
+            * ( {([])} )
+            * (  )
+    * これら全てに対応する, かつ`check_chunk_valid`を再利用するためには, 対応する閉じかっこが出てくるまでこの関数を呼びたい.
+    * `isValid`の入力は, 同じく複数チャンクからなる可能性があるので似た形式のループで`check_chunk_valid`を呼んであげる.
+    * 以下の形のコードは２回出現する
+        ```python
+        while processing_idx < len(s):
+            if not check_chunk_valid():
+                return False
+        ```
+
+
+
+```python
+class Solution:
+    def isValid(self, s: str) -> bool:
+        open_to_close = {
+            "(" : ")",
+            "{" : "}",
+            "[" : "]"
+        }
+        open_brackets = open_to_close.keys()
+        processing_idx = 0
+
+        def check_chunk_valid():
+            nonlocal processing_idx
+            if s[processing_idx] not in open_brackets:
+                return False
+            expected_end_bracket = open_to_close[s[processing_idx]]
+            processing_idx += 1
+            while processing_idx < len(s) and s[processing_idx] != expected_end_bracket:
+                if not check_chunk_valid():
+                    return False
+            if processing_idx >= len(s):
+                return False
+            processing_idx += 1
+            return True
+        
+        while processing_idx < len(s):
+            if not check_chunk_valid():
+                return False
+        
+        return True
+```
