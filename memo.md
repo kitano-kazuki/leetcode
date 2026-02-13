@@ -69,6 +69,9 @@ class Solution:
 
 ## Code3 (再帰)
 
+* `return True`や`return False`が交互に出現するのが気持ち悪かったので, `return True`が最後に登場するようにした.
+* 途中計算に使う値を変数に切り出して読みやすくした
+
 ```python
 BRACKET_PAIRS = {
     "(" : ")",
@@ -93,4 +96,33 @@ class Solution:
 
     def isValid(self, s: str) -> bool:
         return self._isValid(s, 0, [])
+```
+
+# Step2
+
+## Code2-2 (stack)
+
+```python
+class Solution:
+    def isValid(self, s: str) -> bool:
+        unclosed_brackets = []
+        parentheses_pairs = {
+            "(" : ")",
+            "{" : "}",
+            "[" : "]"
+        }
+        open_brackets = parentheses_pairs.keys()
+        for i in range(len(s)):
+            if s[i] in open_brackets:
+                unclosed_brackets.append(s[i])
+                continue
+            if len(unclosed_brackets) == 0:
+                return False
+            last_unclosed_bracket = unclosed_brackets.pop(-1)
+            expected_close_bracket = parentheses_pairs[last_unclosed_bracket]
+            if s[i] != expected_close_bracket:
+                return False
+        if len(unclosed_brackets) > 0:
+            return False
+        return True
 ```
