@@ -5,12 +5,12 @@ class Solution:
         carry = 0
         tail = None
         while node2 is not None:
-            node1_val = 0
+            node1_value = 0
             node1_next = None
             if node1 is not None:
-                node1_val = node1.val
+                node1_value = node1.val
                 node1_next = node1.next
-            summed_value = node1_val + node2.val + carry
+            summed_value = node1_value + node2.val + carry
             node2.val = summed_value % 10
             carry = summed_value // 10
             if node2.next is None:
@@ -23,5 +23,5 @@ class Solution:
                 tail = node2
                 node2 = node2.next
         if carry != 0:
-            tail.next = ListNode(carry) 
+            tail.next = ListNode(carry)
         return l2
