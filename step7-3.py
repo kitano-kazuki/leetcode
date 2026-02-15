@@ -1,10 +1,9 @@
-# バグありコード. Step7で修正
 class Parser:
     def __init__(self):
         self.V = ["S", "C"]
-        self.T = ["(", ")", "{", "}", "[", "]", ""]
+        self.T = ["(", ")", "{", "}", "[", "]", "e"]
         self.P = {
-            "S" : ["CS",""],
+            "S" : ["CS","e"],
             "C" : ["(S)", "{S}","[S]"]
         }
         self.S = "S"
@@ -17,8 +16,8 @@ class Parser:
     def first(self, alpha):
         if alpha in self.first_map:
             return self.first_map[alpha]
-        if alpha == "":
-            return set([""])
+        if alpha == "e":
+            return set(["e"])
         result = set()
         for i in range(len(alpha)):
             symbol = alpha[i]
@@ -32,13 +31,13 @@ class Parser:
                 ith_first_result = set()
                 for produced in self.P[symbol]:
                     ith_first_result = ith_first_result.union(self.first(produced))
-                if "" not in ith_first_result:
+                if "e" not in ith_first_result:
                     result = result.union(ith_first_result)
                     self.first_map[alpha] = result
                     return result
-                ith_first_result.remove("")
+                ith_first_result.remove("e")
                 result = result.union(ith_first_result)
-        result.add("")
+        result.add("e")
         self.first_map[alpha] = result
         return result
 
@@ -54,10 +53,10 @@ class Parser:
                             self.follow_map[symbol] = set()
                         remaining_string = produced[processing_idx+1:]
                         remaining_string_first_result = self.first(remaining_string)
-                        if remaining_string == "" or "" in remaining_string_first_result:
-                            self.follow_map[symbol] = self.follow_map[symbol].union(self.follow_map[production_head])
-                        if "" in remaining_string_first_result:
-                            remaining_string_first_result.remove("")
+                        if remaining_string == "" or "e" in remaining_string_first_result:
+                            self.follow_map[production_head] = self.follow_map[production_head].union(self.follow_map[symbol])
+                        if "e" in remaining_string_first_result:
+                            remaining_string_first_result.remove("e")
                         self.follow_map[symbol] = self.follow_map[symbol].union(remaining_string_first_result)
         return
 
@@ -76,14 +75,15 @@ class Parser:
                 produced_first_result = self.first(produced)
                 for terminal in produced_first_result:
                     self.parsing_table[production_head][terminal].append({production_head : produced})
-                if "" in produced_first_result:
+                if "e" in produced_first_result:
                     head_follow_result = self.follow(production_head)
                     for terminal in head_follow_result:
                         self.parsing_table[production_head][terminal].append({production_head : produced})
-        print(self.parsing_table)
+        # print(self.parsing_table)
         return
     
     def parse(self, input):
+        initial_input = input
         for word in input:
             if word not in self.T:
                 # print(f"word [{word}] is not the terminal used in this language")
@@ -92,6 +92,8 @@ class Parser:
         stack = ["$", self.S]
         processing_idx = 0
         while stack[-1] != "$":
+            # print("cur_stack", stack)
+            # print("predicting word", processing_idx, input[processing_idx])
             symbol = stack.pop()
             word = input[processing_idx]
             if symbol == word:
@@ -109,9 +111,13 @@ class Parser:
                 return False
             production_rule = production_rules[0]
             produced = production_rule[symbol]
-            if produced != "":
+            # print("produced", produced, "for symbol", symbol)
+            if produced != "e":
                 for produced_word in produced[::-1]:
                     stack.append(produced_word)
+        # print("processing id", processing_idx)
+        if processing_idx < len(initial_input):
+            return False
         return True
     
 class Solution:
@@ -120,4 +126,4 @@ class Solution:
         return parser.parse(s)
 
 solution = Solution()
-print(solution.isValid("}"))
+print(solution.isValid("()"))
