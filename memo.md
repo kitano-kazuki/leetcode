@@ -217,7 +217,7 @@ class Solution:
 
 * LL(1)の実装をした.
 * アルゴリズムとかは[ブログ](https://kazuki.jp.net/archives/456)にまとめた.
-* `follow`で循環が起きているとバグりそうだけど, うまいこと対照する方法が思いつかなかった.
+* `follow`で循環が起きているとバグりそうだけど, うまいこと対処する方法が思いつかなかった.
     * A -> aBC
         * first(C)が"#"を含む時, follow(A)を計算して, follow(B)に追加する
     * B -> aAC
