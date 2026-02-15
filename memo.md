@@ -213,127 +213,131 @@ class Solution:
         return True
 ```
 
-# Step6 (LL(1)を実装中だが, バグとりに苦戦中)
+# Step6/7/8 (LL(1))
+
+* LL(1)の実装をした.
+* アルゴリズムとかは[ブログ](https://kazuki.jp.net/archives/456)にまとめた.
+* `follow`で循環が起きているとバグりそうだけど, うまいこと対照する方法が思いつかなかった.
+    * A -> aBC
+        * first(C)が"#"を含む時, follow(A)を計算して, follow(B)に追加する
+    * B -> aAC
+        * follow(B)を計算して, follow(A)に追加する
+    * このような生成規則が与えられるとバグりそう  
 
 ```python
 class Parser:
-    def __init__(self):
-        self.V = ["S", "C"]
-        self.T = ["(", ")", "{", "}", "[", "]", ""]
-        self.P = {
-            "S" : ["CS",""],
-            "C" : ["(S)", "{S}","[S]"]
-        }
-        self.S = "S"
-        self.first_map = {}
-        self.follow_map = {}
+    def __init__(self, terminals, nonterminals, rules, start_symbol):
+        self.terminals = terminals
+        self.nonterminals = nonterminals
+        self.rules = rules
+        self.start_symbol = start_symbol
+        self.follow_memo = {}
         self.parsing_table = {}
-        self._construct_follow_map()
         self._construct_parsing_table()
     
-    def first(self, alpha):
-        if alpha in self.first_map:
-            return self.first_map[alpha]
-        if alpha == "":
-            return set([""])
+    def first(self, string):
+        if len(string) == 1:
+            if string == "#":
+                return set(["#"])
+            if string in self.terminals:
+                return set([string])
+            result = set()
+            for produced_string in self.rules[string]:
+                result = result | self.first(produced_string)
+            return result
+                    
         result = set()
-        for i in range(len(alpha)):
-            symbol = alpha[i]
-            if symbol in self.T:
-                result.add(symbol)
-                self.first_map[alpha] = result
+        for symbol in string:
+            symbol_first_result = self.first(symbol)
+            if "#" not in symbol_first_result:
+                result = result | symbol_first_result
                 return result
-            if symbol not in self.V:
-                raise ValueError(f"the input word [{alpha}] begins with the character not defined in this language.")
-            if symbol in self.V:
-                ith_first_result = set()
-                for produced in self.P[symbol]:
-                    ith_first_result = ith_first_result.union(self.first(produced))
-                if "" not in ith_first_result:
-                    result = result.union(ith_first_result)
-                    self.first_map[alpha] = result
-                    return result
-                ith_first_result.remove("")
-                result = result.union(ith_first_result)
-        result.add("")
-        self.first_map[alpha] = result
+            symbol_first_result.remove("#")
+            result = result | symbol_first_result
+        result.add("#")
         return result
 
-    def _construct_follow_map(self):
-        self.follow_map[self.S] = set(["$"])
-        for production_head, produced_list in self.P.items():
-            for produced in produced_list:
-                for processing_idx, symbol in enumerate(produced):
-                    if symbol in self.T:
-                        continue
-                    if symbol in self.V:
-                        if symbol not in self.follow_map:
-                            self.follow_map[symbol] = set()
-                        remaining_string = produced[processing_idx+1:]
-                        remaining_string_first_result = self.first(remaining_string)
-                        if remaining_string == "" or "" in remaining_string_first_result:
-                            self.follow_map[symbol] = self.follow_map[symbol].union(self.follow_map[production_head])
-                        if "" in remaining_string_first_result:
-                            remaining_string_first_result.remove("")
-                        self.follow_map[symbol] = self.follow_map[symbol].union(remaining_string_first_result)
-        return
-
-    def follow(self, A):
-        if A not in self.V:
-            raise ValueError(f"the input variable [{A}] is not a variable used in this language")
-        return self.follow_map[A]
-        
+    def follow(self, nonterminal):
+        if nonterminal not in self.nonterminals:
+            raise ValueError(f"{nonterminal} is not non-terminal")
+        if nonterminal in self.follow_memo:
+            return self.follow_memo[nonterminal]
+        result = set() if nonterminal != self.start_symbol else set(["$"])
+        for production_head, produced_strings in self.rules.items():
+            for produced_string in produced_strings:
+                nonterminal_idx = produced_string.find(nonterminal)
+                if nonterminal_idx == -1:
+                    continue
+                while nonterminal_idx != -1:
+                    remaining_string = produced_string[nonterminal_idx + 1:]
+                    if remaining_string:
+                        remaining_string_first_res = self.first(remaining_string)
+                        if "#" not in remaining_string_first_res:
+                            result = result | remaining_string_first_res
+                        else:
+                            production_head_follow_result = self.follow(production_head) if production_head != nonterminal else set()
+                            result = result | production_head_follow_result | (remaining_string_first_res - set(["#"]))
+                    else:
+                        production_head_follow_result = self.follow(production_head) if production_head != nonterminal else set()
+                        result = result | production_head_follow_result
+                    nonterminal_idx = produced_string.find(nonterminal, nonterminal_idx + 1)
+        self.follow_memo[nonterminal] = result
+        return result
+            
     def _construct_parsing_table(self):
-        for non_terminal in self.V:
-            self.parsing_table[non_terminal] = {}
-            for terminal in self.T + ["$"]:
-                self.parsing_table[non_terminal][terminal] = []
-        for production_head, produced_list in self.P.items():
-            for produced in produced_list:
-                produced_first_result = self.first(produced)
-                for terminal in produced_first_result:
-                    self.parsing_table[production_head][terminal].append({production_head : produced})
-                if "" in produced_first_result:
+        for nonterminal in self.nonterminals:
+            self.parsing_table[nonterminal] = {}
+            for terminal in self.terminals + ["$"]:
+                self.parsing_table[nonterminal][terminal] = []
+        for production_head, produced_strings in self.rules.items():
+            for produced_string in produced_strings:
+                produced_string_first_result = self.first(produced_string)
+                if "#" in produced_string_first_result:
                     head_follow_result = self.follow(production_head)
                     for terminal in head_follow_result:
-                        self.parsing_table[production_head][terminal].append({production_head : produced})
-        print(self.parsing_table)
+                        self.parsing_table[production_head][terminal].append({production_head : produced_string})
+                    produced_string_first_result.remove("#")
+                for terminal in produced_string_first_result:
+                    self.parsing_table[production_head][terminal].append({production_head : produced_string})
+        # print(self.parsing_table)
         return
     
     def parse(self, input):
-        for word in input:
-            if word not in self.T:
-                # print(f"word [{word}] is not the terminal used in this language")
-                return False
+        end_idx = len(input)
         input = input + "$"
-        stack = ["$", self.S]
+        stack = ["$", self.start_symbol]
         processing_idx = 0
         while stack[-1] != "$":
             symbol = stack.pop()
-            word = input[processing_idx]
-            if symbol == word:
+            input_char = input[processing_idx]
+            if symbol == input_char:
                 processing_idx += 1
                 continue
-            if symbol in self.T:
-                # print(f"The given input is not this language")
+            if symbol in self.terminals:
                 return False
-            if not self.parsing_table[symbol][word]:
-                # print(f"There is no way to parse the symbol [{symbol}] with preceeding word [{word}]")
+            if not self.parsing_table[symbol][input_char]:
                 return False
-            production_rules = self.parsing_table[symbol][word]
+            production_rules = self.parsing_table[symbol][input_char]
             if len(production_rules) >= 2:
-                # print(f"There are multiple rules to convert {symbol} with one word prediction of {word}")
                 return False
             production_rule = production_rules[0]
-            produced = production_rule[symbol]
-            if produced != "":
-                for produced_word in produced[::-1]:
-                    stack.append(produced_word)
-        return True
+            produced_string = production_rule[symbol]
+            if produced_string != "#":
+                for produced_char in produced_string[::-1]:
+                    stack.append(produced_char)
+        return processing_idx == end_idx
     
 class Solution:
     def isValid(self, s: str) -> bool:
-        parser = Parser()
+
+        nonterminals = ["S", "C"]
+        terminals = ["(", ")", "{", "}", "[", "]", "e"]
+        rules = {
+            "S" : ["CS","#"],
+            "C" : ["(S)", "{S}","[S]"]
+        }
+        start_symbol = "S"
+        parser = Parser(terminals, nonterminals, rules, start_symbol)
         return parser.parse(s)
 
 ```
