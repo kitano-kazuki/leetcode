@@ -69,6 +69,8 @@ class Solution:
 
 ## Code1-1 (別のリストに数字を保存)
 
+* `values[::-1]`とするよりも, `range(len(values) - 1, -1, -1)`を使った方が, 配列が新たにコピーされなくて済むので効率的かと思ったが, 結局`range()`も新しく配列を新たに作成する上, 中に含まれるのはどちらも`int`型だから変わらない気がしてきた.
+
 ```python
 class Solution:
     def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
