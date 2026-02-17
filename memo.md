@@ -79,14 +79,14 @@ class Solution:
         while node is not None:
             values.append(node.val)
             node = node.next
-
-        dummy_reverse_head = ListNode()
-        reverse_tail = dummy_reverse_head
-        for value in values[::-1]:
-            new_node = ListNode(value)
-            reverse_tail.next = new_node
-            reverse_tail = reverse_tail.next
-        return dummy_reverse_head.next
+        
+        dummy_reversed_head = ListNode()
+        reversed_tail = dummy_reversed_head
+        for i in range(len(values) - 1, -1, -1):
+            new_node = ListNode(values[i])
+            reversed_tail.next = new_node
+            reversed_tail = reversed_tail.next
+        return dummy_reversed_head.next
 ```
 
 ## Code1-2 (別のメモリ使用. one path)
@@ -113,12 +113,12 @@ class Solution:
     def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
         if head is None:
             return None
-        reversed_head = None
+        prev = None
         node = head
         while node is not None:
             next_node = node.next
-            node.next = reversed_head
-            reversed_head = node
+            node.next = prev
+            prev = node
             node = next_node
-        return reversed_head
+        return prev
 ```
