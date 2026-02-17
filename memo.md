@@ -98,13 +98,13 @@ class Solution:
         if head is None:
             return None
         node = head
-        reversed_tail = None
+        reversed_head = None
         while node is not None:
             new_node = ListNode(node.val)
-            new_node.next = reversed_tail
-            reversed_tail = new_node
+            new_node.next = reversed_head
+            reversed_head = new_node
             node = node.next
-        return reversed_tail
+        return reversed_head
 ```
 
 ## Code1-3 (in-place, one path)
