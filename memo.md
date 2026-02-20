@@ -71,3 +71,68 @@ class KthLargest:
       return self.topk_nums[-1]
 
 ```
+
+# Step2 - 色々と調べてみる.
+
+* 計算時間の見積もり.
+    * Pythonの場合は, 1secあたり, 10^8ステップ計算可能.
+        * [参考](https://github.com/ichika0615/arai60/pull/8#discussion_r1898337850)
+        > Python の場合は 1 秒あたり 100 万ステップ程度計算できます。
+* 優先度つきキューを使用する場合は, 要素数をk個に限定していればアクセスをO(1)で行える.
+* kが負の場合を弾くことを検討するべきだった.
+    * [参考](https://github.com/katataku/leetcode/pull/8/changes#r1856437996)
+    > 負の場合、[:k] のところで、予期しないスライスができるか落ちるかで、中途半端にそれらしい値が出てくることになるでしょう。 あまり意味のないものがそれっぽく動き続けるのは、わりとデバッグのときに困ります。
+* Pythonのinsertのコストは予想通り`O(n)`だった.
+    * [参考１](https://wiki.python.org/moin/TimeComplexity)
+    > the largest costs come from ... or from inserting or deleting somewhere near the beginning (because everything after that must move).
+    * [参考２](https://docs.python.org/3/library/bisect.html#bisect.insort)
+    > Keep in mind that the O(log n) search is dominated by the slow O(n) insertion step.
+* 今回実装したものと同じもの（バイナリサーチで探してから挿入）は`insort`メソッドで可能.
+
+
+## Code2-1
+
+```python
+import bisect
+
+class KthLargest:
+
+    def __init__(self, k: int, nums: List[int]):
+      if k < 0:
+        raise ValueError("k must be positive integer.")
+      if len(nums) < k - 1:
+        raise ValueError("The number of elements in nums should be more than or equal to k - 1.")
+      self.k = k
+      sorted_nums = sorted(nums, reverse=True)
+      self.topk_nums = sorted_nums[:self.k]
+
+    def add(self, val: int) -> int:
+      bisect.insort(self.topk_nums, val, key=lambda x: -x)
+      if len(self.topk_nums) > self.k:
+        self.topk_nums.pop()
+      return self.topk_nums[-1]
+```
+
+## Code2-2
+
+```python
+import heapq
+
+class KthLargest:
+
+    def __init__(self, k: int, nums: List[int]):
+        self.topk_heap = []
+        if k < 0:
+            raise ValueError("k must be positive integer")
+        if len(nums) < k - 1:
+            raise ValueError("The number of elements should be more than or equal to k - 1")
+        self.k = k
+        for num in nums:
+            heapq.heappush(self.topk_heap, num)
+
+    def add(self, val: int) -> int:
+        heapq.heappush(self.topk_heap, val)
+        while len(self.topk_heap) > self.k:
+            heapq.heappop(self.topk_heap)
+        return self.topk_heap[0]
+```
