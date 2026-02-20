@@ -1,11 +1,12 @@
 import heapq
+
 class KthLargest:
 
     def __init__(self, k: int, nums: List[int]):
-        if k < 0:
-            raise ValueError("k must be positive")
+        if k <= 0:
+            raise ValueError("k must be more than zero")
         if len(nums) < k - 1:
-            raise ValueError("len(nums) should be more than or equal to k - 1")
+            raise ValueError("len(nums) must be more than ore equal to k - 1")
         self.topk_heap = []
         self.k = k
         for num in nums:
