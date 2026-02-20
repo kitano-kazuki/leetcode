@@ -5,11 +5,10 @@ class KthLargest:
         if k < 0:
             raise ValueError("k must be positive")
         if len(nums) < k - 1:
-            raise ValueError("Should meet condition: len(nums) >= k - 1")
-        self.k = k
+            raise ValueError("len(nums) should be more than or equal to k - 1")
         sorted_nums = sorted(nums, reverse=True)
         self.topk_nums = sorted_nums[:k]
-        
+        self.k = k
 
     def add(self, val: int) -> int:
         bisect.insort(self.topk_nums, val, key=lambda x: -x)
