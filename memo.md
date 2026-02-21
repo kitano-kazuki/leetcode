@@ -104,6 +104,10 @@
     * https://github.com/potrue/leetcode/pull/9/files#diff-dce85bf5bc3acb0f755f06a75043875e90f52eadc5e761421acc856335cfec86R55
     * https://github.com/t-ooka/leetcode/commit/fbde086fff574ad5ff59eb6d39992a1de646c481
 
+  * 標準の辞書の順番
+    * [公式ドキュメント](https://docs.python.org/3/library/stdtypes.html#dict:~:text=Dictionaries%20preserve%20insertion%20order.%20Note%20that%20updating%20a%20key%20does%20not%20affect%20the%20order.%20Keys%20added%20after%20deletion%20are%20inserted%20at%20the%20end.)
+    * > Dictionaries preserve insertion order. Note that updating a key does not affect the order. Keys added after deletion are inserted at the end.
+
   # 他の解法
 
   ## Bucket Sort
@@ -113,6 +117,14 @@
   ```
 
   ## Quick Select
+
+  ```python
+
+  ```
+
+  # おまけ
+
+  ## Quick Sort
 
   ```python
 
