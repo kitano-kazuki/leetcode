@@ -231,3 +231,73 @@ def quick_select(nums, k, partition_method):
     
     return quick_select(partitioned_nums[partition_idx + 1:], k - num_elements_lte_pivot, partition_method)
 ```
+
+# 別の解法を実装
+
+## Bucket Sort
+
+```python
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        max_count = 0
+        num_to_count = {}
+        for num in nums:
+            num_to_count.setdefault(num, 0)
+            num_to_count[num] += 1
+            max_count = max(max_count, num_to_count[num])
+        nums_by_count = [[] for _ in range(max_count + 1)]
+        for num, count in num_to_count.items():
+            nums_by_count[count].append(num)
+        result = []
+        for count in range(max_count, -1, -1):
+            if len(nums_by_count[count]) + len(result) <= k:
+                result.extend(nums_by_count[count])
+                continue
+            num_elements_to_add = k - len(result)
+            result.extend(nums_by_count[count][:num_elements_to_add])
+            break
+        return result
+```
+
+## Quick Select
+
+```python
+# Quick Select
+import random
+
+
+class Solution:
+    def partition(self, unique_nums, num_to_counts, left, right, pivot_idx):
+        unique_nums[right], unique_nums[pivot_idx] = unique_nums[pivot_idx], unique_nums[right]
+        pivot = num_to_counts[unique_nums[right]]
+        partition_idx = left
+        for i in range(left, right):
+            if num_to_counts[unique_nums[i]] <= pivot:
+                unique_nums[i], unique_nums[partition_idx] = unique_nums[partition_idx], unique_nums[i]
+                partition_idx += 1
+        unique_nums[partition_idx], unique_nums[right] = unique_nums[right], unique_nums[partition_idx]
+        return partition_idx
+
+    def quick_select(self, unique_nums, num_to_counts, left, right, smallest_k):
+        if left == right:
+            return
+        pivot_idx = random.randint(left, right)
+        partition_idx = self.partition(unique_nums, num_to_counts, left, right, pivot_idx)
+        if partition_idx == smallest_k:
+            return
+        if partition_idx > smallest_k:
+            self.quick_select(unique_nums, num_to_counts, left, partition_idx - 1, smallest_k)
+        else:
+            self.quick_select(unique_nums, num_to_counts, partition_idx + 1, right, smallest_k)
+        return
+        
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        num_to_counts = {}
+        for num in nums:
+            num_to_counts.setdefault(num, 0)
+            num_to_counts[num] += 1
+        unique_nums = list(num_to_counts)
+        n = len(unique_nums)
+        self.quick_select(unique_nums, num_to_counts, 0, n - 1,  n - k)
+        return unique_nums[n - k:]
+```
