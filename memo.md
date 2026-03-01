@@ -160,3 +160,70 @@ class Solution:
         return list(hash_to_group.values())
 
 ```
+
+# Step2
+
+## Code2-1
+
+* `sorted_word_to_group.values()`で得られるものを直接`return`するように変更
+
+```python
+from typing import List
+
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        sorted_word_to_group = {}
+        for word in strs:
+            sorted_word = "".join(sorted(word))
+            sorted_word_to_group.setdefault(sorted_word, [])
+            sorted_word_to_group[sorted_word].append(word)
+        return list(sorted_word_to_group.values())
+```
+
+## Code2-2
+
+* `chr`や`hash`などのライブラリに含まれる関数を避けた.
+*　変数名や関数名を変更
+
+```python
+from typing import List
+
+
+class Solution:
+    def calculate_hash_by_alphabet_count(self, word):
+
+        def calculate_alphabet_count_value(alphabet, count):
+            bit_span = 7
+            bit_maximum = 2 ** bit_span - 1
+            if count < 0 or count > bit_maximum:
+                raise ValueError(f"count: {count} must be zero or positive and less than or equal to {bit_maximum}")
+
+            a_ord = ord("a")
+            z_ord = ord("z")
+            alphabet_ord = ord(alphabet)
+            if alphabet_ord < a_ord or z_ord < alphabet_ord:
+                raise ValueError(f"alphabet: {alphabet} must be small english letter")
+
+            position = alphabet_ord - a_ord
+            return count << position * bit_span
+
+
+        alphabet_to_count = {}
+        for alphabet in word:
+            alphabet_to_count.setdefault(alphabet, 0)
+            alphabet_to_count[alphabet] += 1
+
+        hash = 0
+        for alphabet, count in alphabet_to_count.items():
+            hash += calculate_alphabet_count_value(alphabet, count)
+        return hash
+
+
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        hash_to_group = {}
+        for word in strs:
+            hash_value = self.calculate_hash_by_alphabet_count(word)
+            hash_to_group.setdefault(hash_value, [])
+            hash_to_group[hash_value].append(word)
+        return list(hash_to_group.values())
+```
