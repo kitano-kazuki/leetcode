@@ -282,3 +282,21 @@ class Solution:
         return list(hash_to_group.values())
 
 ```
+
+# 学んだこと
+
+* bitを使わなくても, `tuple`自体がhashableなことを利用すればもっと単純にかけた.
+* やっていることは似ているが, 公式の`tuple`のハッシュ化の方が効率化されていそう
+    * https://github.com/python/cpython/blob/main/Objects/tupleobject.c
+
+```c
+    for (Py_ssize_t i = 0; i < len; i++) {
+        Py_uhash_t lane = PyObject_Hash(item[i]);
+        if (lane == (Py_uhash_t)-1) {
+            return -1;
+        }
+        acc += lane * _PyTuple_HASH_XXPRIME_2;
+        acc = _PyTuple_HASH_XXROTATE(acc);
+        acc *= _PyTuple_HASH_XXPRIME_1;
+    }
+```
