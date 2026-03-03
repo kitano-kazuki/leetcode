@@ -124,3 +124,96 @@ class Solution:
         return list(result_set)
         
 ```
+
+# Memo
+
+## Nanに対しての==演算について
+
+https://discord.com/channels/1084280443945353267/1201211204547383386/1208701087264280596
+> ただ、nan というのがあって、nan == nan が False です。 IEEE754 を確認しておいてください。
+
+https://docs.python.org/ja/3/reference/expressions.html#value-comparisons
+> 非数値である float('NaN') と decimal.Decimal('NaN') は特別です。 数と非数値との任意の順序比較は偽です。 直観に反する帰結として、非数値は自分自身と等価ではないことになります。 例えば x = float('NaN') ならば、 3 < x, x < 3, x == x は全て偽で、x != x は真です。 この振る舞いは IEEE 754 に従ったものです。
+
+## 出題意図について
+
+https://github.com/katataku/leetcode/pull/12#discussion_r1894613102
+> 要するにこの問題の推定される出題意図は条件を変えたときに案がいくつか出てくるかです。
+
+https://github.com/quinn-sasha/leetcode/pull/13#discussion_r1960884543
+> この問題は問題文自体では終わっていなくて、解けた後に、いくつか追加の条件が出てきて、その下でのアルゴリズムとそれらの pros and cons が要求されると思います。
+
+## Python内部のSetのintersectionの実装について
+
+要素数が小さい方のSetを走査して, 各要素が要素数の大きい方のSetに含まれているか見ている
+
+https://github.com/python/cpython/blob/ea90b032a016122e7871e91c5210f3b4e68768b4/Objects/setobject.c#L1675
+
+```c
+...
+    if (PySet_GET_SIZE(other) > PySet_GET_SIZE(so)) {
+        tmp = (PyObject *)so;
+        so = (PySetObject *)other;
+        other = tmp;
+    }
+
+    while (set_next((PySetObject *)other, &pos, &entry)) {
+        key = entry->key;
+        hash = entry->hash;
+        Py_INCREF(key);
+        rv = set_contains_entry(so, key, hash);
+        if (rv < 0) {
+            Py_DECREF(result);
+            Py_DECREF(key);
+            return NULL;
+        }
+        if (rv) {
+            if (set_add_entry(result, key, hash)) {
+                Py_DECREF(result);
+                Py_DECREF(key);
+                return NULL;
+            }
+        }
+        Py_DECREF(key);
+    }
+    return (PyObject *)result;
+...
+```
+
+## 二分探索を使った解法について
+
+`nums2`だけを最初にソートして, `num2`の各要素についてその存在を`nums1`の二分探索で確かめる方法.
+`nums1`のソートにO(nlogn)
+`nums1`の二分探索にO(logn)
+`nums2`の要素数がmとする.
+全体では, O(nlogn + mlogn)
+
+引用したコード
+https://github.com/aki235/Arai60/pull/13/files#diff-6c0496a496cb8f7a35d43bf248b1df530eadc13c9be2b8c1270a983021b9e762R74
+
+```python
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        # nums1は長いソート済みのリスト、nums2は短い未ソートのリストを想定
+        nums1 = sorted(nums1) # 想定に合わせるためソート
+
+        intersection = []
+        for num in nums2:
+            if num in intersection:
+                continue
+
+            left = -1
+            right = len(nums1)
+
+            while right - left > 1:
+                middle = (right + left) // 2
+                if num < nums1[middle]:
+                    right = middle
+                elif num > nums1[middle]:
+                    left = middle
+                else:
+                    intersection.append(num)
+                    break
+
+        return intersection
+```
