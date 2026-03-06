@@ -159,3 +159,28 @@ class Solution:
         return count
 
 ```
+
+# Memo
+
+## 他の人の解法やコメント
+
+* Magic Numberについて
+    * https://github.com/n6o/leetcode_arai60/pull/17
+        * WATER, LANDを用いて`0`や`1`などのマジックナンバーの意味をわかりやすくしている
+* 内部関数の使用について
+    * https://github.com/Hiroto-Iizuka/coding_practice/pull/17/files#r2716085615
+        * > 関数のネスト(関数の中に関数を作ること)は、変数をクロージャで使いたいい場合はOK
+        * > ただし、関数を隠すためにネストするのはよくない. デバッグしたいときに外部から呼び出せなくなるから
+* Stack上限について
+    * https://github.com/aki235/Arai60/pull/17
+        * > Pythonのrecursion_limitは1000だが、入力の大きさはm,n <= 300なので、300*300=90000くらいまでありうる
+    * https://github.com/Hiroto-Iizuka/coding_practice/pull/17/files#r2716085615
+        * 1 <= m, n <= 300 より、最大で 9 万回の再帰呼び出しが行われます。これによりスタックオーバーフローが起こる可能性があります。
+* Union-findについて
+    * https://discord.com/channels/1084280443945353267/1183683738635346001/1197738650998415500
+        * > union-find  は、微妙に常識から外れるかな(多くの人が知っているだろうが知らなくてもドン引きはされない)、くらいの感覚です。DFS による解法のほうは常識でしょう。
+    * https://github.com/ksaito0629/leetcode_arai60/pull/16
+    * https://github.com/dxxsxsxkx/leetcode
+        * UnionFindの解法も試している.
+
+## Code2-3 (Union-find)
