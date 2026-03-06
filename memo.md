@@ -65,3 +65,73 @@ class Solution:
 
 ```
 
+# Memo
+
+## 別の解放
+
+### Queue
+
+https://github.com/colorbox/leetcode/pull/29#discussion_r1861430039
+> 1-pass で処理するにあたり、文字をキューに入れていき、 2 回以上出現する文字を取り除いていくというやり方を考えました。
+
+
+### Dict + Set
+
+https://github.com/shining-ai/leetcode/pull/15#issuecomment-1966682629
+> ああ、2回以上出てきたやつは、普通の set に、1回のやつは、OrderedDict にいれてみたらどうですか?
+
+https://discord.com/channels/1084280443945353267/1201211204547383386/1211047696862023722
+> set使えば綺麗にできましたね。
+
+https://discord.com/channels/1084280443945353267/1195700948786491403/1231538588529852426
+> Python 3.7 から dict は順序が保存するようになったので、こういうこともできます。
+
+## Magic number -1
+
+https://github.com/ksaito0629/leetcode_arai60/pull/14/files#r2852198379
+> -1 が特殊な値のマジックナンバーになっているのが気になりました。定数として定義すると、読み手にとって読みやすくなると思います。
+
+# Step4
+
+## Code4-2(Dict + Set)
+
+* 今まで見た２つ以上存在する文字をsetに保存
+* ユニークになり得る候補を登場した順番にdictに入れておく
+* 今見ている文字を確認. 
+    * すでに2以上存在していた場合は, スルー
+    * 1だった場合は, dictの候補から削除
+    * 0だった場合は, dictの候補に追加
+
+```python
+class Solution:
+    def firstUniqChar(self, s: str) -> int:
+        duplicates = set()
+        unique_char_to_idx = {}
+        for i in range(len(s)):
+            if s[i] in duplicates:
+                continue
+            if s[i] in unique_char_to_idx:
+                del unique_char_to_idx[s[i]]
+                duplicates.add(s[i])
+                continue
+            unique_char_to_idx[s[i]] = i
+
+        if unique_char_to_idx:
+            return next(iter(unique_char_to_idx.values()))
+        return -1
+    
+```
+
+* 削除の計算量は`dummy`を配置するだけなのでO(1)
+
+https://github.com/python/cpython/blob/main/Objects/dictobject.c
+```
+Dummy.  index == DKIX_DUMMY  (combined only)
+   Previously held an active (key, value) pair, but that was deleted and an
+   active pair has not yet overwritten the slot.
+```
+
+https://github.com/python/cpython/blob/c3fb0d9d96902774c08b199dda0479a8d31398a5/Objects/dictobject.c#L2865
+```c
+dictkeys_set_index(mp->ma_keys, hashpos, DKIX_DUMMY);
+```
