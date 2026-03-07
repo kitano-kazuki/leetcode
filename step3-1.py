@@ -3,14 +3,13 @@ import copy
 
 class Solution:
     def numIslands(self, grid: List[List[str]]) -> int:
+        grid_copy = copy.deepcopy(grid)
         num_rows = len(grid)
         num_cols = len(grid[0])
 
         WATER = "0"
         LAND = "1"
-
-        grid_copy = copy.deepcopy(grid)
-
+        
         def rewrite_land_to_water_and_recur_adjacents(row, col):
             if row < 0 or num_rows <= row:
                 return
@@ -18,21 +17,23 @@ class Solution:
                 return
             if grid_copy[row][col] == WATER:
                 return
-
+            
             grid_copy[row][col] = WATER
             dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)]
             for dr, dc in dirs:
-                next_r = row + dr
-                next_c = col + dc
-                if next_r < 0 or num_rows <= next_r:
+                next_row = row + dr
+                next_col = col + dc
+                if next_row < 0 or num_rows <= next_row:
                     continue
-                if next_c < 0 or num_cols <= next_c:
+                if next_col < 0 or num_cols <= next_col:
                     continue
-                if grid_copy[next_r][next_c] == WATER:
+                if grid_copy[next_row][next_col] == WATER:
                     continue
-                rewrite_land_to_water_and_recur_adjacents(next_r, next_c)
-            return
+                rewrite_land_to_water_and_recur_adjacents(next_row, next_col)
 
+            return     
+
+        
         num_islands = 0
         for r in range(num_rows):
             for c in range(num_cols):
@@ -42,4 +43,4 @@ class Solution:
                 rewrite_land_to_water_and_recur_adjacents(r, c)
         
         return num_islands
-                
+            
