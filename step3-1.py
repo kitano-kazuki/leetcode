@@ -3,29 +3,35 @@ import copy
 
 class Solution:
     def numIslands(self, grid: List[List[str]]) -> int:
-        grid_copy = copy.deepcopy(grid)
         num_rows = len(grid)
         num_cols = len(grid[0])
 
-        LAND = "1"
         WATER = "0"
+        LAND = "1"
 
-        def rewrite_land_to_water_and_recur_adjacent(row: int, col: int) -> None:
-            if row < 0 or num_rows <= row or col < 0 or num_cols <= col:
+        grid_copy = copy.deepcopy(grid)
+
+        def rewrite_land_to_water_and_recur_adjacents(row, col):
+            if row < 0 or num_rows <= row:
+                return
+            if col < 0 or num_cols <= col:
                 return
             if grid_copy[row][col] == WATER:
                 return
 
             grid_copy[row][col] = WATER
-            dirs = [(1, 0), (0, -1), (-1, 0), (0, 1)]
+            dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)]
             for dr, dc in dirs:
-                adj_row = row + dr
-                adj_col = col + dc
-                if adj_row < 0 or num_rows <= adj_row or adj_col < 0 or num_cols <= adj_col:
+                next_r = row + dr
+                next_c = col + dc
+                if next_r < 0 or num_rows <= next_r:
                     continue
-                if grid_copy[adj_row][adj_col] == WATER:
+                if next_c < 0 or num_cols <= next_c:
                     continue
-                rewrite_land_to_water_and_recur_adjacent(adj_row, adj_col)
+                if grid_copy[next_r][next_c] == WATER:
+                    continue
+                rewrite_land_to_water_and_recur_adjacents(next_r, next_c)
+            return
 
         num_islands = 0
         for r in range(num_rows):
@@ -33,7 +39,7 @@ class Solution:
                 if grid_copy[r][c] == WATER:
                     continue
                 num_islands += 1
-                rewrite_land_to_water_and_recur_adjacent(r, c)
-
+                rewrite_land_to_water_and_recur_adjacents(r, c)
+        
         return num_islands
                 

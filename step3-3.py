@@ -8,40 +8,39 @@ class UnionFind:
     def find(self, idx):
         if self.parent[idx] == idx:
             return idx
-        parent_idx = self.find(self.parent[idx])
-        self.parent[idx] = parent_idx
-        return parent_idx
+        parent = self.find(self.parent[idx])
+        self.parent[idx] = parent
+        return parent
 
     def union(self, idx1, idx2):
-        parent_idx1 = self.find(idx1)
-        parent_idx2 = self.find(idx2)
-        if parent_idx1 == parent_idx2:
+        parent1 = self.find(idx1)
+        parent2 = self.find(idx2)
+        if parent1 == parent2:
             return
-
-        if self.rank[parent_idx1] < self.rank[parent_idx2]:
-            self.parent[parent_idx1] = parent_idx2
+        
+        if self.rank[parent1] < self.rank[parent2]:
+            self.parent[parent1] = parent2
             return
-        elif self.rank[parent_idx2] < self.rank[parent_idx1]:
-            self.parent[parent_idx2] = parent_idx1
+        elif self.rank[parent2] < self.rank[parent1]:
+            self.parent[parent2] = parent1
             return
         else:
-            self.parent[parent_idx2] = parent_idx1
-            self.rank[parent_idx1] += 1
+            self.parent[parent2] = parent1
+            self.rank[parent1] += 1
             return
 
     def is_root(self, idx):
         return self.find(idx) == idx
-        
+            
 
 class Solution:
     def numIslands(self, grid: List[List[str]]) -> int:
         num_rows = len(grid)
         num_cols = len(grid[0])
-        num_elements = num_rows * num_cols
-        uf = UnionFind(num_elements)
-        flatten_row_col = lambda row, col : row * num_cols + col
         LAND = "1"
         WATER = "0"
+        flatten_row_col = lambda row, col : row * num_cols + col
+        uf = UnionFind(num_rows * num_cols)
         for r in range(num_rows):
             for c in range(num_cols):
                 if grid[r][c] == WATER:
@@ -50,11 +49,14 @@ class Solution:
                     uf.union(flatten_row_col(r, c), flatten_row_col(r + 1, c))
                 if c + 1 < num_cols and grid[r][c + 1] == LAND:
                     uf.union(flatten_row_col(r, c), flatten_row_col(r, c + 1))
-        
+                
         num_islands = 0
         for r in range(num_rows):
             for c in range(num_cols):
-                if grid[r][c] == LAND and uf.is_root(flatten_row_col(r, c)):
+                if grid[r][c] == WATER:
+                    continue
+                if uf.is_root(flatten_row_col(r, c)):
                     num_islands += 1
         
         return num_islands
+                
