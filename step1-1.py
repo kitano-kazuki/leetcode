@@ -4,7 +4,7 @@ import copy
 
 
 class Node:
-    def __init__(self, id : int, nexts : List[Node] = []):
+    def __init__(self, id : int, nexts : List[Node]):
         self.id = id
         self.nexts = nexts
     
@@ -35,27 +35,29 @@ class Solution:
                 end_node_id = word1_id
 
             if word1_id not in id_to_node:
-                id_to_node[word1_id] = Node(word1_id)
+                id_to_node[word1_id] = Node(word1_id, [])
             word1_node = id_to_node[word1_id]
             for word2_id in range(word1_id + 1, len(wordList)):
                 if not is_one_word_difference(wordList[word1_id], wordList[word2_id]):
                     continue
                 if word2_id not in id_to_node:
-                    id_to_node[word2_id] = Node(word2_id)
+                    id_to_node[word2_id] = Node(word2_id, [])
                 word2_node = id_to_node[word2_id]
                 word1_node.nexts.append(word2_node)
+                word2_node.nexts.append(word1_node)
 
 
         copy_word_list = copy.deepcopy(wordList)
         if start_node_id is None:
             copy_word_list.extend([beginWord])
             start_node_id = len(copy_word_list) - 1
-            start_node = Node(start_node_id)
+            start_node = Node(start_node_id, [])
             id_to_node[start_node_id] = start_node
             for word_id in range(len(wordList)):
                 if not is_one_word_difference(beginWord, copy_word_list[word_id]):
                     continue
                 start_node.nexts.append(id_to_node[word_id])
+                id_to_node[word_id].nexts.append(start_node)
 
         total_words = len(copy_word_list)                
 
