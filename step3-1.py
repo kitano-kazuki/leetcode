@@ -14,8 +14,8 @@ class Solution:
             assert grid[row][col] == LAND
             assert not visited[row][col]
 
-            visited[row][col] = True
             area_size = 1
+            visited[row][col] = True
             dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)]
             for dr, dc in dirs:
                 next_row = row + dr
