@@ -9,13 +9,13 @@ class Solution:
         visited = [[False for _ in range(num_cols)] for _ in range(num_rows)]
 
         def get_area_of_island(row, col):
-            assert not visited[row][col]
             assert 0 <= row and row < num_rows
             assert 0 <= col and col < num_cols
             assert grid[row][col] == LAND
+            assert not visited[row][col]
 
-            area_size = 1
             visited[row][col] = True
+            area_size = 1
             dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)]
             for dr, dc in dirs:
                 next_row = row + dr
@@ -31,7 +31,6 @@ class Solution:
                 area_size += get_area_of_island(next_row, next_col)
             return area_size
 
-
         max_area = 0
         for r in range(num_rows):
             for c in range(num_cols):
@@ -42,5 +41,3 @@ class Solution:
                 area = get_area_of_island(r, c)
                 max_area = max(area, max_area)
         return max_area
-                
-        
