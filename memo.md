@@ -244,14 +244,187 @@ class Node:
 
 # Step2
 
-## ToDo
+## Code2-1 (alphabet replacement)
 
-* 1文字違いの探索部分
-    * アルファベット置き換え
-    * ワイルドカード
-    * 前半部分と後半部分
-* 幅優先探索の部分
-    * 通常のBFS
-    * 双方向のBFS
+```python
+from collections import deque, defaultdict
+import copy
+
+class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+
+        def construct_word_to_adjacents_dict(word_list):
+            word_to_adjacents = defaultdict(set)
+            word_set = set(word_list)
+            for word in word_list:
+                for i in range(len(word)):
+                    for alphabet_ord in range(ord("a"), ord("z") + 1):
+                        alphabet = chr(alphabet_ord)
+                        if word[i] == alphabet:
+                            continue
+                        ith_replaced = f"{word[:i]}{alphabet}{word[i + 1:]}"
+                        if ith_replaced in word_set:
+                            word_to_adjacents[word].add(ith_replaced)
+            return word_to_adjacents
+       
+        copy_word_list = copy.deepcopy(wordList)
+        if beginWord not in copy_word_list:
+            copy_word_list.append(beginWord)
+        
+        word_to_adjacents = construct_word_to_adjacents_dict(copy_word_list)
+
+        visited = {word : False for word in copy_word_list}
+        candidate_queue = deque()
+        candidate_queue.append(beginWord)
+        distance = 0
+        while candidate_queue:
+            num_candidates = len(candidate_queue)
+            distance += 1
+            for _ in range(num_candidates):
+                cur_word = candidate_queue.popleft()
+                if visited[cur_word]:
+                    continue
+                visited[cur_word] = True
+                if cur_word == endWord:
+                    return distance
+                if cur_word not in word_to_adjacents:
+                    continue
+                for adj_word in word_to_adjacents[cur_word]:
+                    candidate_queue.append(adj_word)
+        
+        NOT_FOUND = 0
+        return NOT_FOUND
+
+```
+
+## Code2-2 (wild card)
+
+```python
+from collections import deque, defaultdict
+import copy
+
+class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+
+        def construct_word_to_adjacents_dict(word_list):
+            # MEMO: 実行時にforのwordが取り込まれそうで怖いからwに変数名を変えた
+            get_patterns = lambda w : [ (w[:i], w[i + 1:]) for i in range(len(w))]
+            pattern_to_words = defaultdict(list)
+            for word in word_list:
+                for pattern in get_patterns(word):
+                    pattern_to_words[pattern].append(word)
+
+            word_to_adjacents = defaultdict(list)
+            for word in word_list:
+                for pattern in get_patterns(word):
+                    adj_words = pattern_to_words[pattern]
+                    # MEMO: extendの時に後追加されるものはdeepcopyなのか？？？今回はshallowでも影響ないけど
+                    word_to_adjacents[word].extend(adj_words)
+            
+            return word_to_adjacents
+        
+        word_list_copy = copy.deepcopy(wordList)
+        if beginWord not in word_list_copy:
+            word_list_copy.append(beginWord)
+
+        word_to_adjacents = construct_word_to_adjacents_dict(word_list_copy)
+
+        visited = set()
+        candidates = deque()
+        candidates.append(beginWord)
+        distance = 0
+        while candidates:
+            num_candidates = len(candidates)
+            distance += 1
+            for _ in range(num_candidates):
+                cur_word = candidates.popleft()
+                if cur_word in visited:
+                    continue
+                visited.add(cur_word)
+                if cur_word == endWord:
+                    return distance
+                for adj_word in word_to_adjacents[cur_word]:
+                    if adj_word in visited:
+                        continue
+                    candidates.append(adj_word)
+        
+        NOT_FOUND = 0
+        return NOT_FOUND
+
+
+```
+
+## Code2-3 (former latter dict)
+
+```python
+from collections import deque, defaultdict
+import copy
+
+class Solution:
+    def get_word_to_adjacents(self, word_list: list[str]) -> dict[str, list[str]]:
+        word_to_adjacents = defaultdict(list)
+
+        def register_to_word_to_adjacents_in_range(start_idx, end_idx, candidates):
+            if start_idx > end_idx:
+                return
+            if start_idx == end_idx:
+                for i in range(len(candidates)):
+                    for j in range(len(candidates)):
+                        if i == j:
+                            continue
+                        word_to_adjacents[candidates[i]].append(candidates[j])
+                return
+                
+            mid_idx = (start_idx + end_idx) // 2
+            former_to_matched_words = defaultdict(list)
+            latter_to_matched_words = defaultdict(list)
+            for candidate in candidates:
+                former = candidate[start_idx:mid_idx + 1]
+                if former:
+                    former_to_matched_words[former].append(candidate)
+                latter = candidate[mid_idx + 1:end_idx + 1]
+                if latter:
+                    latter_to_matched_words[latter].append(candidate)
+            
+            for former_matched_candidates in former_to_matched_words.values():
+                register_to_word_to_adjacents_in_range(mid_idx + 1, end_idx, former_matched_candidates)
+            for latter_matched_candidates in latter_to_matched_words.values():
+                register_to_word_to_adjacents_in_range(start_idx, mid_idx, latter_matched_candidates)
+            return
+
+        register_to_word_to_adjacents_in_range(0, len(word_list[0]) - 1, word_list)
+        return word_to_adjacents
+
+    
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+        copy_word_list = copy.deepcopy(wordList)
+        if beginWord not in copy_word_list:
+            copy_word_list.append(beginWord)
+        
+        word_to_adjacents = self.get_word_to_adjacents(copy_word_list)
+
+        visited = set()
+        candidates = deque()
+        candidates.append(beginWord)
+        distance = 0
+        while candidates:
+            num_candidates = len(candidates)
+            distance += 1
+            for _ in range(num_candidates):
+                cur_word = candidates.popleft()
+                if cur_word in visited:
+                    continue
+                visited.add(cur_word)
+                if cur_word == endWord:
+                    return distance
+                for adj_word in word_to_adjacents[cur_word]:
+                    if adj_word in visited:
+                        continue
+                    candidates.append(adj_word)
+        NOT_FOUND = 0
+        return NOT_FOUND
+
+```
+
 
 # Step3
