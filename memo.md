@@ -279,3 +279,89 @@ class Solution:
             
 
 ```
+
+## Memo
+
+* `setrecursionlimit`について
+    * https://github.com/olsen-blue/Arai60/pull/18#discussion_r1919805259
+        * > まあ、setrecursionlimit できるような環境ならば設定すればいいわけですが、たとえば、ライブラリーを作っているとすると、これはグローバルに設定を変えることになるので他のところに影響が出る可能性がありますね。
+
+* `stack`による`DFS`
+    * `setrecursionlimit`を変更することに忌避感があるのであれば, stackを用いた`DFS `も検討できる
+        * https://github.com/aki235/Arai60/pull/18/files#diff-9fe83a5ebd0765dc3d775b7bbf3048d8f6ff02247c075977086bf46f21a077b4R98
+
+* 内部関数の仕様について気になったから調べた
+    * 内部関数はその内部関数の実行時に関数オブジェクトが作られる.
+    * 内部関数の定義後に定義した変数も関数オブジェクトに含まれるのでは？
+        * スコープでは, どちらも外部関数内の変数として扱われるはず.
+        * 以下の例はどちらも同じ動作をした
+
+```python
+def outer():
+    x = 1
+    def inner():
+        return x
+    print(inner())
+    return
+
+
+def outer2():
+    def inner2():
+        return x
+    x = 1
+    print(inner2())
+    return
+```
+
+
+
+## Code2-3 (DFS with Stack)
+
+```python
+from typing import List
+
+class Solution:
+    def maxAreaOfIsland(self, grid: List[List[int]]) -> int:
+        num_rows = len(grid)
+        num_cols = len(grid[0])
+        WATER = 0
+        LAND = 1
+        visited = [[False for _ in range(num_cols)] for _ in range(num_rows)]
+
+        def get_area_of_island(row, col):
+            assert not visited[row][col]
+            to_visit = [(row, col)]
+            area_size = 0
+            while to_visit:
+                r, c = to_visit.pop()
+                if visited[r][c]:
+                    continue
+                visited[r][c] = True
+                area_size += 1
+                dirs = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+                for dr, dc in dirs:
+                    next_r = r + dr
+                    next_c = c + dc
+                    if next_r < 0 or num_rows <= next_r:
+                        continue
+                    if next_c < 0 or num_cols <= next_c:
+                        continue
+                    if grid[next_r][next_c] == WATER:
+                        continue
+                    if visited[next_r][next_c]:
+                        continue
+                    to_visit.append((next_r, next_c))
+            return area_size
+                
+        maximum_area = 0
+        for r in range(num_rows):
+            for c in range(num_cols):
+                if grid[r][c] == WATER:
+                    continue
+                if visited[r][c]:
+                    continue
+                area = get_area_of_island(r, c)
+                maximum_area = max(area, maximum_area)
+        return maximum_area
+
+```
