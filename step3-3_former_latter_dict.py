@@ -4,48 +4,52 @@ import copy
 
 class Solution:
 
-    def group_one_word_different_words_in_range(self, word_list: list[str], check_range_left: int, check_range_right: int) -> list[list[str]]:
-        if check_range_left == check_range_right:
-            return [word_list]
+    def group_one_word_differents_in_range(self, range_start: int, range_end: int, words: list[str]) -> list[set[str]]:
+        if range_start > range_end:
+            return []
+        if range_start == range_end:
+            words_set = set(words)
+            if len(words_set) == 1:
+                return []
+            return [words_set]
         
-        check_range_mid = (check_range_left + check_range_right) // 2
-        former_half_to_words = defaultdict(list)
-        latter_half_to_words = defaultdict(list)
-        for word in word_list:
-            if check_range_left <= check_range_mid:
-                former_half = word[check_range_left:check_range_mid + 1]
-                former_half_to_words[former_half].append(word)
-            if check_range_mid + 1 <= check_range_right:
-                latter_half = word[check_range_mid + 1:check_range_right + 1]
-                latter_half_to_words[latter_half].append(word)
+        range_mid = (range_start + range_end) // 2
+        former_to_words = defaultdict(list)
+        latter_to_words = defaultdict(list)
+        for word in words:
+            if range_start <= range_mid:
+                former = word[range_start:range_mid + 1]
+                former_to_words[former].append(word)
+            if range_mid + 1 <= range_end:
+                latter = word[range_mid + 1:range_end + 1]
+                latter_to_words[latter].append(word)
         
         result = []
-        if check_range_mid + 1 <= check_range_right:
-            for words_with_same_former in former_half_to_words.values():
-                if len(words_with_same_former) == 1:
-                    continue
-                groups = self.group_one_word_different_words_in_range(words_with_same_former, check_range_mid + 1, check_range_right)
+        if range_mid + 1 <= range_end:
+            for words_with_same_former in former_to_words.values():
+                groups = self.group_one_word_differents_in_range(range_mid + 1, range_end, words_with_same_former)
                 result.extend(groups)
-        if check_range_left <= check_range_mid:
-            for words_with_same_latter in latter_half_to_words.values():
-                if len(words_with_same_latter) == 1:
-                    continue
-                groups = self.group_one_word_different_words_in_range(words_with_same_latter, check_range_left, check_range_mid)
+        if range_start <= range_mid:
+            for words_with_same_latter in latter_to_words.values():
+                groups = self.group_one_word_differents_in_range(range_start, range_mid, words_with_same_latter)
                 result.extend(groups)
         
         return result
+            
 
+    def get_word_to_adjacents_dict(self, word_list: list[str]) -> defaultdict[str, set[str]]:
+        if not word_list:
+            return defaultdict(set)
 
-    def get_word_to_adjacents_dict(self, word_list: list[str]) -> dict[str, set[str]]:
-        one_word_different_groups = self.group_one_word_different_words_in_range(word_list, 0, len(word_list[0]) - 1)
-
+        groups = self.group_one_word_differents_in_range(0, len(word_list[0]) - 1, word_list)
         word_to_adjacents = defaultdict(set)
-        for group in one_word_different_groups:
+        for group in groups:
             group_set = set(group)
-            for word in group_set:
+            for word in group:
                 word_to_adjacents[word] = word_to_adjacents[word] | group_set
         
         return word_to_adjacents
+
             
 
     def ladderLength(self, beginWord: str, endWord: str, wordList: list[str]) -> int:
