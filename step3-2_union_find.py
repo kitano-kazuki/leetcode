@@ -1,6 +1,5 @@
 from typing import List
 
-
 class UnionFind:
     def __init__(self, size):
         self.parents = [i for i in range(size)]
@@ -19,7 +18,7 @@ class UnionFind:
         if self.rank[parent1] < self.rank[parent2]:
             self.parents[parent1] = parent2
             return
-        if self.rank[parent2] < self.rank[parent1]:
+        if self.rank[parent2] < self.rank[parent2]:
             self.parents[parent2] = parent1
             return
         self.parents[parent2] = parent1
@@ -31,9 +30,8 @@ class Solution:
         uf = UnionFind(n)
         for edge in edges:
             uf.union(edge[0], edge[1])
-        
-        num_components = 0
 
+        num_components = 0
         seen_parent = set()
         for node in range(n):
             parent = uf.find(node)

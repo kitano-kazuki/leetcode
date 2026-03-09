@@ -25,6 +25,7 @@ class Solution:
                     if visited[neighbor_node]:
                         continue
                     frontier.append(neighbor_node)
+            return
         
         num_components = 0
         for node in range(n):
@@ -32,5 +33,4 @@ class Solution:
                 continue
             num_components += 1
             visit_connected(node)
-
         return num_components
