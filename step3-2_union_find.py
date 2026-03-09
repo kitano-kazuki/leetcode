@@ -1,5 +1,6 @@
 from typing import List
 
+
 class UnionFind:
     def __init__(self, size):
         self.parents = [i for i in range(size)]
@@ -24,20 +25,21 @@ class UnionFind:
         self.parents[parent2] = parent1
         self.rank[parent1] += 1
         return
-        
 
 class Solution:
     def countComponents(self, n: int, edges: List[List[int]]) -> int:
         uf = UnionFind(n)
-        for edge in  edges:
+        for edge in edges:
             uf.union(edge[0], edge[1])
         
-        seen_parent = set()
         num_components = 0
+
+        seen_parent = set()
         for node in range(n):
             parent = uf.find(node)
             if parent in seen_parent:
                 continue
             seen_parent.add(parent)
             num_components += 1
+        
         return num_components
