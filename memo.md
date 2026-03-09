@@ -265,6 +265,36 @@ class Solution:
 
 ## Code2-2 (wild card)
 
+* extendの挙動について
+    * extendは複数回の`append`と考えたら良さそう
+    * 文字列はimmutableなので, 下の１つ目の例のintの要素を持つ配列と同じような挙動になる
+
+```python
+a = [1, 2, 3]
+b = [4, 5, 6]
+a.extend(b)
+print(a)
+b.append(7)
+print(a)
+
+# [1, 2, 3, 4, 5, 6]
+# [1, 2, 3, 4, 5, 6]
+
+a = [[1], [2], [3]]
+b = [[4], [5], [6]]
+a.extend(b)
+print(a)
+b[0].append(7)
+print(a)
+
+# [[1], [2], [3], [4], [5], [6]]
+# [[1], [2], [3], [4, 7], [5], [6]]
+```
+
+* lambda関数の引数について
+    * lambda xとしたときのxはlocal変数なので大丈夫
+    * lambda: xとした場合は, xを外から取り込むことになる. この時のxは実行時に取り込まれるので注意が必要
+
 ```python
 from collections import deque, defaultdict
 import copy
