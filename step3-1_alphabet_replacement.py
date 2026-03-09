@@ -5,26 +5,26 @@ from collections import defaultdict, deque
 
 class Solution:
     def get_word_to_adjacents_dict(self, word_list: list[str]) -> dict[str, list[str]]:
-
-        def yield_one_letter_replaced(word: str) -> Generator[str, None, None]:
-            for i in range(len(word)):
+        
+        def yield_one_letter_replaced_word(word: str) -> Generator[str, None, None]:
+            for pos in range(len(word)):
                 for alphabet_ord in range(ord("a"), ord("z") + 1):
                     alphabet = chr(alphabet_ord)
-                    if word[i] == alphabet:
+                    if alphabet == word[pos]:
                         continue
-                    yield f"{word[:i]}{alphabet}{word[i + 1:]}"
+                    yield f"{word[:pos]}{alphabet}{word[pos + 1:]}"
 
         word_to_adjacents = defaultdict(list)
+        
         word_list_set = set(word_list)
         for word in word_list:
-            for replaced_word in yield_one_letter_replaced(word):
+            for replaced_word in yield_one_letter_replaced_word(word):
                 if replaced_word in word_list_set:
                     word_to_adjacents[word].append(replaced_word)
         
         return word_to_adjacents
                     
-                
-            
+
     def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
         word_list_copy = copy.deepcopy(wordList)
         if beginWord not in word_list_copy:
@@ -32,9 +32,9 @@ class Solution:
         
         word_to_adjacents = self.get_word_to_adjacents_dict(word_list_copy)
 
-        visited = set()
         candidates = deque()
         candidates.append(beginWord)
+        visited = set()
         distance = 0
         while candidates:
             distance += 1
@@ -52,3 +52,4 @@ class Solution:
         
         NOT_FOUND = 0
         return NOT_FOUND
+            

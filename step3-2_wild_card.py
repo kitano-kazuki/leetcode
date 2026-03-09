@@ -5,22 +5,23 @@ import copy
 
 class Solution:
     def get_word_to_adjacents_dict(self, word_list: list[str]) -> dict[str, list[set]]:
-        
-        def yield_pattern(word: str) -> Generator[tuple[str, str], None, None]:
+
+        def yield_pattern_from_word(word: str) -> Generator[tuple[str, str], None, None]:
             for pos in range(len(word)):
                 yield (word[:pos], word[pos + 1:])
-
+        
         pattern_to_words = defaultdict(set)
         for word in word_list:
-            for word_pattern in yield_pattern(word):
-                pattern_to_words[word_pattern].add(word)
+            for pattern in yield_pattern_from_word(word):
+                pattern_to_words[pattern].add(word)
         
         word_to_adjacents = defaultdict(set)
         for word in word_list:
-            for word_pattern in yield_pattern(word):
-                word_to_adjacents[word] = word_to_adjacents[word].union(pattern_to_words[word_pattern])
+            for pattern in yield_pattern_from_word(word):
+                word_to_adjacents[word] = word_to_adjacents[word] | pattern_to_words[pattern]
         
         return word_to_adjacents
+        
 
     def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
         word_list_copy = copy.deepcopy(wordList)

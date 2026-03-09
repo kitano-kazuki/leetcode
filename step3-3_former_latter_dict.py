@@ -4,51 +4,47 @@ import copy
 
 class Solution:
 
-    def group_one_word_differents(self, word_list: list[str]) -> list[list[str]]:
+    def group_one_word_different_words_in_range(self, word_list: list[str], check_range_left: int, check_range_right: int) -> list[list[str]]:
+        if check_range_left == check_range_right:
+            return [word_list]
         
-        def get_groups_by_narrowing_down_search_length_if_half_same(start_pos: int, end_pos: int, words_to_check: list[str]) -> list[list[str]]:
-            if start_pos == end_pos:
-                return [words_to_check]
-            
-            former_half_to_words = defaultdict(list)
-            latter_half_to_words = defaultdict(list)
-            mid_pos = (start_pos + end_pos) // 2
-            for word in words_to_check:
-                if mid_pos - start_pos >= 0:
-                    former_half = word[start_pos:mid_pos + 1]
-                    former_half_to_words[former_half].append(word)
-                if end_pos - (mid_pos + 1) >= 0:
-                    latter_half = word[mid_pos + 1:end_pos + 1]
-                    latter_half_to_words[latter_half].append(word)
-            
-            result = []
-            for former_same_words in former_half_to_words.values():
-                if not mid_pos + 1 <= end_pos:
+        check_range_mid = (check_range_left + check_range_right) // 2
+        former_half_to_words = defaultdict(list)
+        latter_half_to_words = defaultdict(list)
+        for word in word_list:
+            if check_range_left <= check_range_mid:
+                former_half = word[check_range_left:check_range_mid + 1]
+                former_half_to_words[former_half].append(word)
+            if check_range_mid + 1 <= check_range_right:
+                latter_half = word[check_range_mid + 1:check_range_right + 1]
+                latter_half_to_words[latter_half].append(word)
+        
+        result = []
+        if check_range_mid + 1 <= check_range_right:
+            for words_with_same_former in former_half_to_words.values():
+                if len(words_with_same_former) == 1:
                     continue
-                if len(former_same_words) == 1:
-                    continue
-                groups = get_groups_by_narrowing_down_search_length_if_half_same(mid_pos + 1, end_pos, former_same_words)
+                groups = self.group_one_word_different_words_in_range(words_with_same_former, check_range_mid + 1, check_range_right)
                 result.extend(groups)
-            for latter_same_words in latter_half_to_words.values():
-                if not start_pos <= mid_pos:
+        if check_range_left <= check_range_mid:
+            for words_with_same_latter in latter_half_to_words.values():
+                if len(words_with_same_latter) == 1:
                     continue
-                if len(latter_same_words) == 1:
-                    continue
-                groups = get_groups_by_narrowing_down_search_length_if_half_same(start_pos, mid_pos, latter_same_words)
+                groups = self.group_one_word_different_words_in_range(words_with_same_latter, check_range_left, check_range_mid)
                 result.extend(groups)
-            
-            return result
+        
+        return result
 
-        return get_groups_by_narrowing_down_search_length_if_half_same(0, len(word_list[0]) - 1, word_list)
 
     def get_word_to_adjacents_dict(self, word_list: list[str]) -> dict[str, set[str]]:
-        one_word_different_groups = self.group_one_word_differents(word_list)
+        one_word_different_groups = self.group_one_word_different_words_in_range(word_list, 0, len(word_list[0]) - 1)
 
         word_to_adjacents = defaultdict(set)
         for group in one_word_different_groups:
-            for word in group:
-                word_to_adjacents[word] = word_to_adjacents[word].union(set(group))
-
+            group_set = set(group)
+            for word in group_set:
+                word_to_adjacents[word] = word_to_adjacents[word] | group_set
+        
         return word_to_adjacents
             
 
