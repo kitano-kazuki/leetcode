@@ -21,7 +21,59 @@
         * visitedとかを使えば結局訪れるのはたかだか1回だからO(N)で良さそう
 
 
-## Code1-1 (Union Find)
+
+## Code1-1 (DFS)
+
+* 繋がっているノードを確認するのにO(N)かかるから計算量の見積もりがアプローチで考えたものと違くなりそう
+* 各ノードに対して, 
+    * 繋がっているノードを確認 O(N)
+* O(N^2)かな
+* でも, 繋がっているノードをdictとして持つようにしたら, 繋がっているノードの確認はO(1)でよくなる
+    * ただ, 結局すべてのノードが辺で結ばれていたら, 繋がっているノードはN - 1個になるのでO(N^2)は免れないか？？
+* いや, 今回の場合は, 一度訪れられたノードに再び行くことはないから, O(N)
+* エッジの前処理も含めたらO(N + E)
+
+```python
+from typing import List
+
+class Solution:
+
+    def countComponents(self, n: int, edges: List[List[int]]) -> int:
+
+        def create_adjacent_matrix():
+            adjacent_matrix = [[False] * n for _ in range(n)]
+            for edge in edges:
+                node1 = edge[0]
+                node2 = edge[1]
+                adjacent_matrix[node1][node2] = True
+                adjacent_matrix[node2][node1] = True
+            return adjacent_matrix
+        
+        def visit_all_connected_nodes(cur_node, adj_matrix, visited):
+            if visited[cur_node]:
+                return
+            visited[cur_node] = True
+            for next_node in range(n):
+                if cur_node == next_node:
+                    continue
+                if not adj_matrix[cur_node][next_node]:
+                    continue
+                visit_all_connected_nodes(next_node, adj_matrix, visited)
+            return
+
+        visited = [False] * n
+        adj_matrix = create_adjacent_matrix()
+        num_components = 0
+        for i in range(n):
+            if visited[i]:
+                continue
+            num_components += 1
+            visit_all_connected_nodes(i, adj_matrix, visited)
+        return num_components
+
+```
+
+## Code1-2 (Union Find)
 
 ```python
 from typing import List
@@ -72,57 +124,6 @@ class Solution:
         
         return num_components
             
-```
-
-## Code1-2 (DFS)
-
-* 繋がっているノードを確認するのにO(N)かかるから計算量の見積もりがアプローチで考えたものと違くなりそう
-* 各ノードに対して, 
-    * 繋がっているノードを確認 O(N)
-* O(N^2)かな
-* でも, 繋がっているノードをdictとして持つようにしたら, 繋がっているノードの確認はO(1)でよくなる
-    * ただ, 結局すべてのノードが辺で結ばれていたら, 繋がっているノードはN - 1個になるのでO(N^2)は免れないか？？
-* いや, 今回の場合は, 一度訪れられたノードに再び行くことはないから, O(N)
-* エッジの前処理も含めたらO(N + E)
-
-```python
-from typing import List
-
-class Solution:
-
-    def countComponents(self, n: int, edges: List[List[int]]) -> int:
-
-        def create_adjacent_matrix():
-            adjacent_matrix = [[False] * n for _ in range(n)]
-            for edge in edges:
-                node1 = edge[0]
-                node2 = edge[1]
-                adjacent_matrix[node1][node2] = True
-                adjacent_matrix[node2][node1] = True
-            return adjacent_matrix
-        
-        def visit_all_connected_nodes(cur_node, adj_matrix, visited):
-            if visited[cur_node]:
-                return
-            visited[cur_node] = True
-            for next_node in range(n):
-                if cur_node == next_node:
-                    continue
-                if not adj_matrix[cur_node][next_node]:
-                    continue
-                visit_all_connected_nodes(next_node, adj_matrix, visited)
-            return
-
-        visited = [False] * n
-        adj_matrix = create_adjacent_matrix()
-        num_components = 0
-        for i in range(n):
-            if visited[i]:
-                continue
-            num_components += 1
-            visit_all_connected_nodes(i, adj_matrix, visited)
-        return num_components
-
 ```
 
 # 他の人のコードを確認
