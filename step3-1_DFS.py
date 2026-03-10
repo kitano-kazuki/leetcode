@@ -11,9 +11,9 @@ class Solution:
     def maxDepth(self, root: Optional[TreeNode]) -> int:
         if root is None:
             return 0
-
-        max_depth = 0
+        
         frontier = [(root, 1)]
+        max_depth = 0
         while frontier:
             node, depth = frontier.pop()
             max_depth = max(depth, max_depth)
@@ -23,3 +23,4 @@ class Solution:
                 frontier.append((node.right, depth + 1))
         
         return max_depth
+            
