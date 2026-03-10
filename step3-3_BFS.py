@@ -11,19 +11,19 @@ class TreeNode:
 class Solution:
     def maxDepth(self, root: Optional[TreeNode]) -> int:
         if root is None:
-            return 0
-
+            return  0
+        
         frontier = deque()
         frontier.append(root)
         depth = 0
         while frontier:
-            num_nodes = len(frontier)
+            num_cur_frontiers = len(frontier)
             depth += 1
-            for _ in range(num_nodes):
+            for _ in range(num_cur_frontiers):
                 node = frontier.popleft()
                 if node.left is not None:
                     frontier.append(node.left)
                 if node.right is not None:
                     frontier.append(node.right)
-    
+        
         return depth

@@ -11,15 +11,15 @@ class Solution:
     def maxDepth(self, root: Optional[TreeNode]) -> int:
         if root is None:
             return 0
-        
-        maximum_depth = 0
+
+        max_depth = 0
         frontier = [(root, 1)]
         while frontier:
             node, depth = frontier.pop()
-            if node is None:
-                continue
-            maximum_depth = max(maximum_depth, depth)
-            frontier.append((node.left, depth + 1))
-            frontier.append((node.right, depth + 1))
+            max_depth = max(depth, max_depth)
+            if node.left is not None:
+                frontier.append((node.left, depth + 1))
+            if node.right is not None:
+                frontier.append((node.right, depth + 1))
         
-        return maximum_depth
+        return max_depth
