@@ -17,13 +17,13 @@ class Solution:
         frontier.append(root)
         depth = 0
         while frontier:
-            num_cur_frontiers = len(frontier)
+            num_nodes = len(frontier)
             depth += 1
-            for _ in range(num_cur_frontiers):
+            for _ in range(num_nodes):
                 node = frontier.popleft()
                 if node.left is not None:
                     frontier.append(node.left)
                 if node.right is not None:
                     frontier.append(node.right)
-        
+    
         return depth
