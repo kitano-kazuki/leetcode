@@ -138,14 +138,19 @@ class Solution:
     * 再帰
         * `root.left`と`root.right`をループで回す方法を再帰でもやっている
 * 2 - https://github.com/Satorien/LeetCode/pull/22/files
-    * 帰りがけをループにしたものがコメントで紹介されていた
+    * 帰りがけをstackにしたものがコメントで紹介されていた
         * https://github.com/potrue/leetcode/pull/22#discussion_r2112567800
+        * 一般的にみんながstackで行うdfsは行きがけ
+        * 一方で, 一般的にみんなが再帰で行うdfsは帰りがけ
 * 3 - https://github.com/ryoooooory/LeetCode/pull/25/files
     * whileの中でループすることが決まっているので`while(true)`を使っていた
         * そうしたら`raise RuntimeError`をしなくてよくなる
 * 4 - https://github.com/naoto-iwase/leetcode/pull/21/files
     * 再帰関数の終了処理と, そもそもの与えられた引数の確認が別なら内部関数で処理を分けるのが見やすそう
     * BFSのやり方についてのコメントがあった
+
+* ちなみに, 多くの人は再帰=DFSという表記をしているが, 本PRでは, DFSはstackを使った再帰を表すこととする
+
 ```
 あと、BFS をするのに
 node_queue
