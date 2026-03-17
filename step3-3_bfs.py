@@ -1,4 +1,5 @@
 # 1st 2:44
+# 2nd 1:23
 
 from typing import Optional
 from collections import deque
@@ -18,16 +19,16 @@ class Solution:
             return 0
 
         frontier = deque([root])
-        distance = 1
+        current_depth = 1
         while True:
             next_frontier = deque()
             while frontier:
                 node = frontier.popleft()
                 if node.left is None and node.right is None:
-                    return distance
+                    return current_depth
                 if node.left is not None:
                     next_frontier.append(node.left)
                 if node.right is not None:
                     next_frontier.append(node.right)
+            current_depth += 1
             frontier = next_frontier
-            distance += 1
