@@ -1,5 +1,6 @@
 # 1st 2:10
 # 2nd 1:05
+# 3rd 1:03
 
 from typing import Optional
 
@@ -16,8 +17,8 @@ class Solution:
     def minDepth(self, root: Optional[TreeNode]) -> int:
         if root is None:
             return 0
-        
-        def minDepth_helper(node: TreeNode) -> int:
+
+        def minDepth_helper(node):
             if node.left is None and node.right is None:
                 return 1
             if node.left is None:

@@ -1,5 +1,6 @@
 # 1st 2:44
 # 2nd 1:23
+# 3rd 1:32
 
 from typing import Optional
 from collections import deque
@@ -30,5 +31,5 @@ class Solution:
                     next_frontier.append(node.left)
                 if node.right is not None:
                     next_frontier.append(node.right)
-            current_depth += 1
             frontier = next_frontier
+            current_depth += 1
