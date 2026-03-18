@@ -216,3 +216,158 @@ https://github.com/ksaito0629/leetcode_arai60/pull/4#discussion_r2787261329
                     
 https://github.com/dorxyxki/arai60/pull/7#discussion_r2838988934
 > 手元の比較: 20 ns ほどのオーバーヘッド
+
+## Code2-1 (recursion)
+
+```python
+from typing import Optional
+from copy import deepcopy
+
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+
+class Solution:
+    def mergeTrees(self, root1: Optional[TreeNode], root2: Optional[TreeNode]) -> Optional[TreeNode]:
+        if root1 is None and root2 is None:
+            return None
+        if root1 is None:
+            return deepcopy(root2)
+        if root2 is None:
+            return deepcopy(root1)
+        
+        merged_node = TreeNode(val=root1.val + root2.val)
+        merged_node.left = self.mergeTrees(root1.left, root2.left)
+        merged_node.right = self.mergeTrees(root1.right, root2.right)
+        return merged_node
+
+```
+
+## Code2-2 (dfs)
+
+```python
+from typing import Optional
+from copy import deepcopy
+
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def mergeTrees(self, root1: Optional[TreeNode], root2: Optional[TreeNode]) -> Optional[TreeNode]:
+        if root1 is None and root2 is None:
+            return None
+        if root1 is None:
+            return deepcopy(root2)
+        if root2 is None:
+            return deepcopy(root1)
+
+        def get_merged_val(node1, node2):
+            val = 0
+            if node1 is not None:
+                val += node1.val
+            if node2 is not None:
+                val += node2.val
+            return val
+
+        def get_left(node):
+            if node is None:
+                return None
+            return node.left
+
+        def get_right(node):
+            if node is None:
+                return None
+            return node.right
+                
+        
+        merged_root = TreeNode()
+        frontier = [(root1, root2, merged_root)]
+        while frontier:
+            node1, node2, merged_node = frontier.pop()
+            merged_node.val = get_merged_val(node1, node2)
+
+            node1_left = get_left(node1)
+            node2_left = get_left(node2)
+            if node1_left is not None or node2_left is not None:
+                merged_node.left = TreeNode()
+                frontier.append((node1_left, node2_left, merged_node.left))
+
+            node1_right = get_right(node1)
+            node2_right = get_right(node2)
+            if node1_right is not None or node2_right is not None:
+                merged_node.right = TreeNode()
+                frontier.append((node1_right, node2_right, merged_node.right))
+            
+        return merged_root
+
+```
+
+## Code2-3 (bfs)
+
+```python
+from typing import Optional
+from copy import deepcopy
+
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def mergeTrees(self, root1: Optional[TreeNode], root2: Optional[TreeNode]) -> Optional[TreeNode]:
+        if root1 is None and root2 is None:
+            return None
+        if root1 is None:
+            return deepcopy(root2)
+        if root2 is None:
+            return deepcopy(root1)
+
+        def get_merged_val(node1, node2):
+            val = 0
+            if node1 is not None:
+                val += node1.val
+            if node2 is not None:
+                val += node2.val
+            return val
+        
+        def get_left(node):
+            if node is None:
+                return None
+            return node.left
+
+        def get_right(node):
+            if node is None:
+                return None
+            return node.right
+
+        merged_root = TreeNode()
+        frontier = [(root1, root2, merged_root)]
+        while frontier:
+            next_frontier = []
+            while frontier:
+                node1, node2, merged_node = frontier.pop()
+                merged_node.val = get_merged_val(node1, node2)
+
+                node1_left, node2_left = get_left(node1), get_left(node2)
+                if node1_left is not None or node2_left is not None:
+                    merged_node.left = TreeNode()
+                    next_frontier.append((node1_left, node2_left, merged_node.left))
+                node1_right, node2_right = get_right(node1), get_right(node2)
+                if node1_right is not None or node2_right is not None:
+                    merged_node.right = TreeNode()
+                    next_frontier.append((node1_right, node2_right, merged_node.right))
+            frontier = next_frontier
+        return merged_root
+                    
+```

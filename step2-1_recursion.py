@@ -1,4 +1,3 @@
-# solved 8:33
 from typing import Optional
 from copy import deepcopy
 
