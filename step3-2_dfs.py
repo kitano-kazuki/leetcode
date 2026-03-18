@@ -1,4 +1,5 @@
 # 1st: 3:28
+# 2nd: 3:20
 from typing import Optional
 from copy import deepcopy
 
@@ -25,7 +26,7 @@ class Solution:
             if node2 is not None:
                 val += node2.val
             return val
-
+        
         def get_left(node):
             if node is None:
                 return None
