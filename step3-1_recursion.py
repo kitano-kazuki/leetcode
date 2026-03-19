@@ -1,4 +1,5 @@
 # 1st: 1:41
+# 1st: 1:19
 
 
 # Definition for a binary tree node.
@@ -15,12 +16,11 @@ class Solution:
             if left == right:
                 return TreeNode(nums[left])
             
-            mid_idx = (left + right) // 2
+            mid = (left + right) // 2
             return TreeNode(
-                val=nums[mid_idx],
-                left=sortedArrayToBST_with_range(nums, left, mid_idx - 1),
-                right=sortedArrayToBST_with_range(nums, mid_idx + 1, right)
+                val=nums[mid],
+                left=sortedArrayToBST_with_range(nums, left, mid - 1),
+                right=sortedArrayToBST_with_range(nums, mid + 1, right)
             )
-        
+
         return sortedArrayToBST_with_range(nums, 0, len(nums) - 1)
-        
