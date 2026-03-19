@@ -1,5 +1,6 @@
 # 1st: 1:41
 # 1st: 1:19
+# 1st: 1:12
 
 
 # Definition for a binary tree node.
@@ -22,5 +23,4 @@ class Solution:
                 left=sortedArrayToBST_with_range(nums, left, mid - 1),
                 right=sortedArrayToBST_with_range(nums, mid + 1, right)
             )
-
         return sortedArrayToBST_with_range(nums, 0, len(nums) - 1)

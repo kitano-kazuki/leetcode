@@ -1,5 +1,6 @@
 # 1st: 1:55
 # 1st: 1:41
+# 1st: 1:25
 
 # Definition for a binary tree node.
 # class TreeNode:
@@ -21,5 +22,5 @@ class Solution:
             if mid + 1 <= right:
                 node.right = TreeNode()
                 frontier.append((mid + 1, right, node.right))
-        return root
             
+        return root
