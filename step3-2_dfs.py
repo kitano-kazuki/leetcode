@@ -1,5 +1,6 @@
 # 1st: 3:27
 # 2nd: 1:13
+# 3rd: 1:17
 
 
 # Definition for a binary tree node.
