@@ -1,4 +1,5 @@
 # 1st: 2:24
+# 2nd: 0:51
 
 
 # Definition for a binary tree node.
@@ -14,7 +15,4 @@ class Solution:
         is_leaf = root.left is None and root.right is None
         if is_leaf and root.val == targetSum:
             return True
-        next_target_sum = targetSum - root.val
-        return self.hasPathSum(root.left, next_target_sum) or self.hasPathSum(root.right, next_target_sum)
-
-        
+        return self.hasPathSum(root.left, targetSum - root.val) or self.hasPathSum(root.right, targetSum - root.val)

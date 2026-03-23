@@ -1,4 +1,5 @@
 # 1st: 1:54
+# 2nd: 1:39
 
 
 # Definition for a binary tree node.
@@ -11,7 +12,6 @@ class Solution:
     def hasPathSum(self, root: TreeNode | None, targetSum: int) -> bool:
         if root is None:
             return False
-        
         frontier = [(root, targetSum)]
         while frontier:
             next_level_frontier = []

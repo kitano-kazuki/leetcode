@@ -1,4 +1,5 @@
 # 1st: 3:27
+# 2nd: 1:13
 
 
 # Definition for a binary tree node.
@@ -22,4 +23,3 @@ class Solution:
             if node.right is not None:
                 node_to_visit.append((node.right, target_sum_at_this_node - node.val))
         return False
-        
