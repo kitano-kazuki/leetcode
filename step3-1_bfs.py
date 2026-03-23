@@ -1,5 +1,6 @@
 # 1st: 2:05
 # 2nd: 1:40
+# 3rd: 1:43
 
 from collections import deque
 
@@ -26,6 +27,6 @@ class Solution:
                     next_frontier.append(node.left)
                 if node.right is not None:
                     next_frontier.append(node.right)
-            level_ordered_values.append(values_at_this_level)
             frontier = next_frontier
+            level_ordered_values.append(values_at_this_level)
         return level_ordered_values
