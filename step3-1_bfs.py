@@ -1,4 +1,6 @@
 # 1st: 2:05
+# 2nd: 1:40
+
 from collections import deque
 
 
@@ -12,8 +14,8 @@ class Solution:
     def levelOrder(self, root: TreeNode | None) -> list[list[int]]:
         if root is None:
             return []
+        frontier = deque([root])
         level_ordered_values = []
-        frontier = deque([(root)])
         while frontier:
             next_frontier = deque([])
             values_at_this_level = []
@@ -24,7 +26,6 @@ class Solution:
                     next_frontier.append(node.left)
                 if node.right is not None:
                     next_frontier.append(node.right)
-            frontier = next_frontier
             level_ordered_values.append(values_at_this_level)
+            frontier = next_frontier
         return level_ordered_values
-        
