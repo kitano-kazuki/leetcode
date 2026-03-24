@@ -1,3 +1,6 @@
+# 1st: 2:46
+# 2nd: 計測忘れ
+# 3rd: 2:01
 from collections import deque
 
 
@@ -11,12 +14,12 @@ class Solution:
     def zigzagLevelOrder(self, root: TreeNode | None) -> list[list[int]]:
         if root is None:
             return []
-        is_left_to_right = True
         frontier = deque([root])
+        is_left_to_right = True
         level_order_values = []
         while frontier:
-            values_at_this_level = []
             next_frontier = deque()
+            values_at_this_level = []
             while frontier:
                 node = frontier.popleft()
                 values_at_this_level.append(node.val)
