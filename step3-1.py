@@ -11,12 +11,12 @@ class Solution:
     def zigzagLevelOrder(self, root: TreeNode | None) -> list[list[int]]:
         if root is None:
             return []
-        level_order_values = []
         is_left_to_right = True
         frontier = deque([root])
+        level_order_values = []
         while frontier:
-            next_frontier = deque()
             values_at_this_level = []
+            next_frontier = deque()
             while frontier:
                 node = frontier.popleft()
                 values_at_this_level.append(node.val)
@@ -30,4 +30,3 @@ class Solution:
             is_left_to_right = not is_left_to_right
             frontier = next_frontier
         return level_order_values
-                
