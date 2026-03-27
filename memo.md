@@ -90,7 +90,7 @@ class Solution:
         return True
 ```
 
-## Code1-1 (BFS)
+## Code1-3 (BFS)
 
 ```python
 # solved 2:38
@@ -121,6 +121,86 @@ class Solution:
                     next_frontier.append((node.right, node.val, maximum_val))
             frontier = next_frontier
         return True
+```
 
-        
+# Step2
+
+## Code2-1 (Recursion)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isValidBST(self, root: TreeNode | None) -> bool:
+        if root is None:
+            return True
+
+        def is_valid_bst_helper(node: TreeNode, minimum_val: int, maximum_val: int) -> bool:
+            if not (minimum_val < node.val < maximum_val):
+                return False
+
+            is_left_subtree_valid = is_valid_bst_helper(node.left, minimum_val, node.val) if node.left is not None else True
+            is_right_subtree_valid = is_valid_bst_helper(node.right, node.val, maximum_val) if node.right is not None else True
+            return is_left_subtree_valid and is_right_subtree_valid
+
+        return is_valid_bst_helper(root, float("-inf"), float("inf"))
+```
+
+## Code2-2 (DFS)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isValidBST(self, root: TreeNode | None) -> bool:
+        if root is None:
+            return True
+
+        node_and_valid_range_pairs = [(root, float("-inf"), float("inf"))]
+        while node_and_valid_range_pairs:
+            node, minimum_val, maximum_val = node_and_valid_range_pairs.pop()
+            if not (minimum_val < node.val < maximum_val):
+                return False
+            if node.left is not None:
+                node_and_valid_range_pairs.append((node.left, minimum_val, node.val))
+            if node.right is not None:
+                node_and_valid_range_pairs.append((node.right, node.val, maximum_val))
+        return True
+```
+
+## Code2-3 (BFS)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isValidBST(self, root: TreeNode | None) -> bool:
+        if root is None:
+            return True
+
+        frontier = [(root, float("-inf"), float("inf"))]
+        while frontier:
+            next_frontier = []
+            for node, minimum_val, maximum_val in frontier:
+                if not (minimum_val < node.val < maximum_val):
+                    return False
+                if node.left is not None:
+                    next_frontier.append((node.left, minimum_val, node.val))
+                if node.right is not None:
+                    next_frontier.append((node.right, node.val, maximum_val))
+            frontier = next_frontier
+        return True
+
 ```

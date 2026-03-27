@@ -5,7 +5,7 @@
 #         self.left = left
 #         self.right = right
 class Solution:
-    def isValidBST(self, root: Optional[TreeNode]) -> bool:
+    def isValidBST(self, root: TreeNode | None) -> bool:
         if root is None:
             return True
 
@@ -13,14 +13,8 @@ class Solution:
             if not (minimum_val < node.val < maximum_val):
                 return False
 
-            is_left_subtree_valid = True
-            if node.left is not None:
-                is_left_subtree_valid = is_valid_bst_helper(node.left, minimum_val, node.val)
-
-            is_right_subtree_valid = True
-            if node.right is not None:
-                is_right_subtree_valid = is_valid_bst_helper(node.right, node.val, maximum_val)
-
+            is_left_subtree_valid = is_valid_bst_helper(node.left, minimum_val, node.val) if node.left is not None else True
+            is_right_subtree_valid = is_valid_bst_helper(node.right, node.val, maximum_val) if node.right is not None else True
             return is_left_subtree_valid and is_right_subtree_valid
 
         return is_valid_bst_helper(root, float("-inf"), float("inf"))
