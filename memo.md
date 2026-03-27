@@ -204,3 +204,19 @@ class Solution:
         return True
 
 ```
+
+# 他の人のコードやコメント
+
+* https://github.com/mamo3gr/arai60/pull/26/files
+    * stackやyieldを使って, Pre-orderだけじゃなくて, In-orderも実装している
+    * In-orderで見たときに, BSTは昇順に並ぶ性質を利用
+
+
+* `maximum_val`や`minimum_val`はその値を含むのかどうかわからないので, `upper_bound_exclusive`などにしたい
+    *  https://github.com/tom4649/Coding/pull/27#discussion_r2963092528
+* そもそも, `minimum`や`maximum`という命名が微妙
+    * https://github.com/dxxsxsxkx/leetcode/pull/28#discussion_r2752202157
+    * > min_value, max_valueがなんの最小値・最大値なのか読み取るのに苦労しました。部分木の最小・最大値でもありませんし、とってもいい値の最小・最大でもない (とっても良い値は min_value < x < max_value : exclusive) なので、やや語弊があるかなと思います。
+
+
+# Step3
