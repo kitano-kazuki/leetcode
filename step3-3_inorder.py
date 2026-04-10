@@ -1,5 +1,6 @@
 # 1st: 13:14
 # 2nd: 3:52
+# 3rd: 3:01
 
 class Solution:
     def buildTree(self, preorder: list[int], inorder: list[int]) -> TreeNode | None:
@@ -17,7 +18,7 @@ class Solution:
             if not right_unresolved:
                 return None
 
-            child = None
+            child  = None
             while right_unresolved:
                 node = right_unresolved[-1]
                 if preorder_index[node.val] < pivot_index:
@@ -26,7 +27,6 @@ class Solution:
                 child = node
                 right_unresolved.pop()
             return child
-
 
         for node_value in inorder:
             node = TreeNode(node_value)

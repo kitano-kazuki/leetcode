@@ -1,5 +1,6 @@
 # 1st: 29:45
 # 2nd: 7:14
+# 3rd: 4:01
 
 from dataclasses import dataclass
 
@@ -11,10 +12,11 @@ from dataclasses import dataclass
 #         self.left = left
 #         self.right = right
 
+
 @dataclass
 class Range:
     left_inclusive: int = 0
-    right_inclusive: int = 0
+    right_inclusive: int = -1
 
     def contains(self, index):
         return self.left_inclusive <= index <= self.right_inclusive
@@ -28,15 +30,16 @@ class Solution:
             raise ValueError
 
         inorder_index = {inorder[i] : i for i in range(len(inorder))}
-        
-        dummy_root = TreeNode()
-        child_unresolved = [(dummy_root, Range(0, len(inorder) - 1), Range())]        
+
+        dummy_node = TreeNode()
+        child_unresolved = [(dummy_node, Range(0, len(inorder) - 1), Range())]
+
 
         i = 0
         while i < len(preorder):
             node_value = preorder[i]
-            parent, left_range, right_range = child_unresolved[-1]
             node = TreeNode(node_value)
+            parent, left_range, right_range = child_unresolved[-1]
             if left_range.contains(inorder_index[node_value]):
                 parent.left = node
                 child_unresolved.append((node, Range(left_range.left_inclusive, inorder_index[node_value] - 1), Range(inorder_index[node_value] + 1, left_range.right_inclusive)))
@@ -47,6 +50,5 @@ class Solution:
                 child_unresolved.append((node, Range(right_range.left_inclusive, inorder_index[node_value] - 1), Range(inorder_index[node_value] + 1, right_range.right_inclusive)))
                 i += 1
                 continue
-            child_unresolved.pop() 
-
-        return dummy_root.left
+            child_unresolved.pop()
+        return dummy_node.left

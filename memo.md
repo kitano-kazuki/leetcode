@@ -262,3 +262,112 @@ class Solution:
         return child
 
 ```
+
+# Step3
+
+## Code3-2 (Preorder)
+
+```python
+# 1st: 29:45
+# 2nd: 7:14
+# 3rd: 4:01
+
+from dataclasses import dataclass
+
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+
+@dataclass
+class Range:
+    left_inclusive: int = 0
+    right_inclusive: int = -1
+
+    def contains(self, index):
+        return self.left_inclusive <= index <= self.right_inclusive
+
+
+class Solution:
+    def buildTree(self, preorder: list[int], inorder: list[int]) -> TreeNode | None:
+        if not preorder or not inorder:
+            raise ValueError()
+        if len(preorder) != len(inorder):
+            raise ValueError
+
+        inorder_index = {inorder[i] : i for i in range(len(inorder))}
+
+        dummy_node = TreeNode()
+        child_unresolved = [(dummy_node, Range(0, len(inorder) - 1), Range())]
+
+
+        i = 0
+        while i < len(preorder):
+            node_value = preorder[i]
+            node = TreeNode(node_value)
+            parent, left_range, right_range = child_unresolved[-1]
+            if left_range.contains(inorder_index[node_value]):
+                parent.left = node
+                child_unresolved.append((node, Range(left_range.left_inclusive, inorder_index[node_value] - 1), Range(inorder_index[node_value] + 1, left_range.right_inclusive)))
+                i += 1
+                continue
+            if right_range.contains(inorder_index[node_value]):
+                parent.right = node
+                child_unresolved.append((node, Range(right_range.left_inclusive, inorder_index[node_value] - 1), Range(inorder_index[node_value] + 1, right_range.right_inclusive)))
+                i += 1
+                continue
+            child_unresolved.pop()
+        return dummy_node.left
+
+```
+
+## Code3-3 (Inorder)
+
+* 右斜め下方向に連続しているノードたちを繋げていくイメージ
+* stackに積まれているのは、右方向がつけられていない（可能性のある）ノード
+* inorderですでに見た（stackに積んだ）けど, preorderのindexが今注目しているノードのインデックス(pivot_index)より手前のもの
+    * => 今注目しているノードよりも、グラフ上で上に位置している。
+
+```python
+# 1st: 13:14
+# 2nd: 3:52
+# 3rd: 3:01
+
+class Solution:
+    def buildTree(self, preorder: list[int], inorder: list[int]) -> TreeNode | None:
+        if not preorder or not inorder:
+            raise ValueError()
+        if len(preorder) != len(inorder):
+            raise ValueError()
+
+        preorder_index = {preorder[i] : i for i in range(len(preorder))}
+
+        right_unresolved = []
+
+
+        def resolve_decendants(pivot_index):
+            if not right_unresolved:
+                return None
+
+            child  = None
+            while right_unresolved:
+                node = right_unresolved[-1]
+                if preorder_index[node.val] < pivot_index:
+                    break
+                node.right = child
+                child = node
+                right_unresolved.pop()
+            return child
+
+        for node_value in inorder:
+            node = TreeNode(node_value)
+            node.left = resolve_decendants(preorder_index[node_value])
+            right_unresolved.append(node)
+        
+        return resolve_decendants(float("-inf"))
+
+```
