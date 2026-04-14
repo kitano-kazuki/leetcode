@@ -1,87 +1,87 @@
-# 1st: 1:05:01
-
 from dataclasses import dataclass
 
+# 1st: 1:05:01
+
+
 @dataclass
-class SegmentTreeVertex:
-    index: int
+class TreeVertex:
+    tree_index: int
     left: int
     right: int
 
-    def get_left_child(self):
+    def get_children(self):
         if self.left == self.right:
             return None
-        return SegmentTreeVertex(self.index * 2, self.left, (self.left + self.right) // 2)
+        mid = (self.left + self.right) // 2
+        return TreeVertex(2 * self.tree_index, self.left, mid), TreeVertex(2 * self.tree_index + 1, mid + 1, self.right)
+
+    def contains(self, index) -> bool:
+        return self.left <= index <= self.right
+
+
+class SegmentTree:
+    def __init__(self, n):
+        self.n = n
+        self.data = [0] * (n * 4)
+
     
-    def get_right_child(self):
-        if self.left == self.right:
-            return None
-        return SegmentTreeVertex(self.index * 2 + 1, (self.left + self.right) // 2 + 1, self.right)
+    def update(self, target_index: int, new_value: int):
 
-    def contains(self, position):
-        return self.left <= position <= self.right
+        def update_helper(vertex: TreeVertex, target_index: int, new_value: int):
+            children = vertex.get_children()
 
-class SegmentTreeMax:
-    def __init__(self, size):
-        self.size = size
-        self.data = [0] * (size * 4)
-    
-
-    def update(self, position: int, new_value: int) -> None:
-
-        def update_helper(vertex: SegmentTreeVertex, position: int, new_value: int) -> None:
-            if vertex.left == position and vertex.right == position:
-                self.data[vertex.index] = new_value
+            if children is None:
+                if vertex.left != target_index:
+                    assert False, "unreachable"
+                self.data[vertex.tree_index] = new_value
                 return
-            left_vertex = vertex.get_left_child()
-            right_vertex = vertex.get_right_child()
-            if left_vertex.contains(position):
-                update_helper(left_vertex, position, new_value)
-            elif right_vertex.contains(position):
-                update_helper(right_vertex, position, new_value)
-            else:
-                raise ValueError()
-            self.data[vertex.index] = max(self.data[left_vertex.index], self.data[right_vertex.index])
-            return
 
-        update_helper(SegmentTreeVertex(1, 0, self.size - 1), position, new_value)
+            left_child, right_child = children
+            if left_child.contains(target_index):
+                update_helper(left_child, target_index, new_value)
+            else:
+                update_helper(right_child, target_index, new_value)
+            self.data[vertex.tree_index] = max(self.data[left_child.tree_index], self.data[right_child.tree_index])
+            return
+        
+        update_helper(TreeVertex(1, 0, self.n - 1), target_index, new_value)
         return
 
-        
+
     def get_max(self, left: int, right: int) -> int:
 
-        def get_max_helper(vertex: SegmentTreeVertex, left, right) -> int:
-            if vertex.right < left or right < vertex.left:
+        def get_max_helper(vertex: TreeVertex, left: int, right: int) -> int:
+            if left > right:
                 return float("-inf")
-            if vertex.left == left and vertex.right == right:
-                return self.data[vertex.index]
 
-            left_vertex = vertex.get_left_child()
-            right_vertex = vertex.get_right_child()
-            return max(get_max_helper(left_vertex, left, min(left_vertex.right, right)), get_max_helper(right_vertex, max(right_vertex.left, left), right))
+            children = vertex.get_children()
+            if children is None:
+                if vertex.left != left:
+                    assert False, "unreachable"
+                return self.data[vertex.tree_index]
+            
+            left_child, right_child = children
+            left_max = get_max_helper(left_child, left, min(left_child.right, right))
+            right_max = get_max_helper(right_child, max(right_child.left, left), right)
+            return max(left_max, right_max)
 
-        return get_max_helper(SegmentTreeVertex(1, 0, self.size - 1), left, right)
-
+        return get_max_helper(TreeVertex(1, 0, self.n - 1), left, right)
+            
 
 
 class Solution:
     def lengthOfLIS(self, nums: list[int]) -> int:
-
         num_to_rank = {num : i + 1 for i, num in enumerate(sorted(set(nums)))}
-        num_ranks = list(map(lambda num : num_to_rank[num], nums))
+        ranks = list(map(lambda num: num_to_rank[num], nums))
 
-        segment_tree = SegmentTreeMax(len(num_ranks) + 1)
-
+        segment_tree = SegmentTree(len(ranks) + 1)
         length_of_LIS = float("-inf")
-        for rank in num_ranks:
-            # maximum length of increasing subsequence ending with x (< rank)
-            max_length = segment_tree.get_max(0, rank - 1)
-            segment_tree.update(rank, max_length + 1)
-            length_of_LIS = max(length_of_LIS, max_length + 1)
+        for rank in ranks:
+            maximum_length = segment_tree.get_max(0, rank - 1)
+            segment_tree.update(rank, maximum_length + 1)
+            length_of_LIS = max(length_of_LIS, maximum_length + 1)
         
         return length_of_LIS
-            
-            
-nums = [10,9,2,5,3,7,101,18]
+
 solution = Solution()
-solution.lengthOfLIS(nums)
+print(solution.lengthOfLIS([-10000]))
