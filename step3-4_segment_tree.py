@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 # 1st: 1:05:01
+# 2nd: 0:53:00
 
 
 @dataclass
