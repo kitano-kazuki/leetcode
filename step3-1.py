@@ -12,4 +12,3 @@ class Solution:
                 unique_paths_next[column] = unique_paths[column] + unique_paths_next[column - 1]
             unique_paths = unique_paths_next
         return unique_paths[-1]
-                
