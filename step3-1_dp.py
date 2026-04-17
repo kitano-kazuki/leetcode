@@ -1,0 +1,26 @@
+class Solution:
+    def rob(self, nums: list[int]) -> int:
+        if not nums:
+            return 0
+        if len(nums) == 1:
+            return nums[0]
+
+        robbed_without_tail = self._rob_houses_in_line(nums, 0, len(nums) - 2)
+        robbed_without_head = self._rob_houses_in_line(nums, 1, len(nums) - 1)
+    
+        return max(robbed_without_head, robbed_without_tail)
+
+    
+    def _rob_houses_in_line(self, nums: list[int], start: int, end: int) -> int:
+        if start > end:
+            return 0
+        if start == end:
+            return nums[start]
+
+        robbed_last = 0
+        skipped_last = 0
+        for i in range(start, end + 1):
+            robbed_last, skipped_last = skipped_last + nums[i], max(robbed_last, skipped_last)
+        
+        return max(robbed_last, skipped_last)
+            
