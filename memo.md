@@ -66,26 +66,25 @@ class Solution:
 
 # Step2
 
-* 変更なし
+* m, nをnum_rowsやnum_colsに変更
 
 ## Code2-1 (DP)
 
 ```python
 class Solution:
     def uniquePathsWithObstacles(self, obstacleGrid: list[list[int]]) -> int:
-        m = len(obstacleGrid)
-        n = len(obstacleGrid[0])
-        SPACE = 0
+        num_rows = len(obstacleGrid)
+        num_columns = len(obstacleGrid[0])
         OBSTACLE = 1
 
         if obstacleGrid[0][0] == OBSTACLE:
             return 0
 
-        previous_unique_paths = [0] * n
+        previous_unique_paths = [0] * num_columns
         previous_unique_paths[0] = 1
-        for row in range(m):
-            unique_paths = [0] * n
-            for column in range(n):
+        for row in range(num_rows):
+            unique_paths = [0] * num_columns
+            for column in range(num_columns):
                 if obstacleGrid[row][column] == OBSTACLE:
                     unique_paths[column] = 0
                 else:
@@ -93,7 +92,6 @@ class Solution:
             previous_unique_paths = unique_paths
 
         return previous_unique_paths[-1]
-
 ```
 
 ## Code2-2 (Recursion)
@@ -147,3 +145,36 @@ class Solution:
 * 打ち切り処理を入れるかどうか
     * https://github.com/dxxsxsxkx/leetcode/pull/34#discussion_r2935592260
         * > 「打ち切り処理を入れるか」といったことは結局は、そのプログラムがどのようなものを扱うかの分布との兼ね合いです。たとえば、ライブラリーのソート関数は、意外とすでにソート済みが入力に来ることが多い、と判断されて、すでにソート済みの場合は何もしない処理が入っていたりすることがあります。しかし、これは分布を試して確認しないことにはなんとも言えない話です。なので、とりあえず、シンプルに作って、必要性との兼ね合いで後から入れることが割と好まれるのですね。
+
+# Step3
+
+## Code3-1 (DP)
+
+```python
+# 1st: 3:30
+# 2nd: 2:28
+# 3rd: 2:06
+
+OBSTACLE = 1
+
+class Solution:
+    def uniquePathsWithObstacles(self, obstacleGrid: list[list[int]]) -> int:
+        num_rows = len(obstacleGrid)
+        num_columns = len(obstacleGrid[0])
+
+        if obstacleGrid[0][0] == OBSTACLE or obstacleGrid[num_rows - 1][num_columns - 1] == OBSTACLE:
+            return 0
+
+        previous_unique_paths = [1] + [0] * (num_columns - 1)
+        for r in range(num_rows):
+            unique_paths = [None] * num_columns
+            for c in range(num_columns):
+                if obstacleGrid[r][c] == OBSTACLE:
+                    unique_paths[c] = 0
+                    continue
+                unique_paths[c] = previous_unique_paths[c] + (unique_paths[c - 1] if c > 0 else 0)
+            previous_unique_paths = unique_paths
+        
+        return previous_unique_paths[-1]
+            
+```
