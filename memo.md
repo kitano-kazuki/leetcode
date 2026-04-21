@@ -141,3 +141,116 @@ class Solution:
         return maximum_profit_from_today[0][EMPTY_STOCK_STATE]
             
 ```
+
+# Step2
+
+## 他の人のコードを見る
+
+* https://github.com/olsen-blue/Arai60/pull/38
+    * Step1では, 前側からDPテーブルの更新を行っている
+        * 日付iまでに出せる利益を格納する手法
+    * Step3では, code1-1と同じ山と谷を見つける解法を行なっている
+        * フォローアップとして想定され得る「最小の売買回数」にも応えられる点が利点
+            * https://github.com/Yoshiki-Iwasa/Arai60/pull/53/files#r1730194725
+* https://github.com/naoto-iwase/leetcode/pull/43 
+    * 上がった日だけ都度差分を足すという貪欲的な方法が取れる
+* https://github.com/mamo3gr/arai60/pull/36
+
+## 他の人のコメントを見る
+
+* 考えられるフォローアップ
+    * https://github.com/5103246/LeetCode_Arai60/pull/36#discussion_r2617507537
+        * > Best Time to Buy and Sell Stock IIIは回数制限のある問題になっているようです。もしご興味があればぜひ。
+    * https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/
+* DPを二次元配列として持つよりも, 一次元配列を二つ用意した方が読みやすい
+    * https://github.com/nanae772/leetcode-arai60/pull/37#discussion_r2423879010
+    * > 私はこういう風に一変数で2次元にしたい気持ちがよく分からないんですよね。 sell_max_profit[i] buy_max_profit[i] と2変数にするのが自然に見えます。(まあ、正確には株を持っているか否かの二状態でしょうが。)
+
+# Step3
+
+## Code3-1 (Valley)
+
+```python
+class Solution:
+
+    def maxProfit(self, prices: list[int]) -> int:
+        if not prices:
+            return 0
+
+        profit = 0
+        for i in range(len(prices)):
+            yesterday_price = prices[i - 1] if i - 1 >= 0 else float("inf")
+            today_price = prices[i]
+            tomorrow_price = prices[i + 1] if i + 1 < len(prices) else float("-inf")
+            if yesterday_price <= today_price and today_price <= tomorrow_price:
+                continue
+            if yesterday_price <= today_price and today_price > tomorrow_price:
+                profit += today_price
+                continue
+            if yesterday_price > today_price and today_price <= tomorrow_price:
+                profit -= today_price
+                continue
+
+        return profit
+
+```
+
+## Code3-3 (DP)
+
+```python
+class Solution:
+
+    def maxProfit(self, prices: list[int]) -> int:
+        if not prices:
+            return 0
+
+        estate_with_stock = [None] * len(prices)
+        estate_without_stock = [None] * len(prices)
+
+        estate_with_stock[0] = -prices[0]
+        estate_without_stock[0] = 0
+
+        for i in range(1, len(prices)):
+            estate_with_stock[i] = max(
+                estate_with_stock[i - 1],
+                estate_without_stock[i - 1] - prices[i]
+            )
+            estate_without_stock[i] = max(
+                estate_with_stock[i - 1] + prices[i],
+                estate_without_stock[i - 1]
+            )
+        
+        return estate_without_stock[-1]
+
+```
+
+# Step4
+
+## Code4-1 (Valley)
+
+```python
+class Solution:
+    def maxProfit(self, prices: list[int]) -> int:
+        if not prices:
+            return 0
+
+        profit = 0
+        for i in range(len(prices)):
+            yesterday_price = prices[i - 1] if i - 1 >= 0 else float("inf")
+            today_price = prices[i]
+            tomorrow_price = prices[i + 1] if i + 1 < len(prices) else float("-inf")
+
+            if yesterday_price == today_price == tomorrow_price:
+                continue
+            if yesterday_price < today_price < tomorrow_price:
+                continue
+            if yesterday_price > today_price and today_price <= tomorrow_price:
+                profit -= today_price
+                continue
+            if yesterday_price <= today_price and today_price > tomorrow_price:
+                profit += today_price
+                continue
+        
+        return profit
+
+```
