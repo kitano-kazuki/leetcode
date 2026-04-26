@@ -158,3 +158,43 @@ class Solution:
         return calc_minimum_num_coins(amount)
 
 ```
+
+# Step3
+
+## 他の人のコード
+
+* https://github.com/olsen-blue/Arai60/pull/40/files
+    * コインの枚数を深さとして, BFS
+        * この解法は浮かばなかった
+* https://github.com/naoto-iwase/leetcode/pull/45/files
+    * DFSの実装もおこなっている
+* https://github.com/mamo3gr/arai60/pull/38/files
+
+
+# Step4
+
+```python
+class Solution:
+    def coinChange(self, coins: list[int], amount: int) -> int:
+        if amount < 0:
+            return -1
+        if amount == 0:
+            return 0
+
+        min_num_coins = [0] + [float("inf")] * amount
+        for target in range(amount + 1):
+            if min_num_coins[target] == float("inf"):
+                continue
+            for coin in coins:
+                if target + coin > amount:
+                    continue
+                min_num_coins[target + coin] = min(
+                    min_num_coins[target + coin],
+                    min_num_coins[target] + 1
+                )
+            
+        if min_num_coins[amount] == float("inf"):
+            return -1
+        return min_num_coins[amount]
+                
+```
