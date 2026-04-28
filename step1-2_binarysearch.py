@@ -1,0 +1,17 @@
+class Solution:
+    def findMin(self, nums: list[int]) -> int:
+        if not nums:
+            raise ValueError("nums must not be empty")
+        if len(nums) == 1:
+            return nums[0]
+
+        left_exclusive = -1
+        right_inclusive = len(nums) - 1
+        while left_exclusive + 1 != right_inclusive:
+            mid = left_exclusive + (right_inclusive - left_exclusive) // 2
+            if nums[0] <= nums[mid] and nums[mid] > nums[-1]:
+                left_exclusive = mid
+            else:
+                right_inclusive = mid
+
+        return nums[right_inclusive]
