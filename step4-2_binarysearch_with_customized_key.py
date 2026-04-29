@@ -11,7 +11,7 @@ class Solution:
             x = compute_priority_of_rotated_array(target),
             key=compute_priority_of_rotated_array
         )
-        
+
         if nums[index] == target:
             return index
         return -1
