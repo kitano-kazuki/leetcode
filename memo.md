@@ -142,7 +142,7 @@ class Solution:
         * 上記で決めた部分的な上り坂に対してbisectでloとhiを指定
     * Step2 - 実装3
         * 上記二つ目と同様のbisectleftのkeyをいじる方法
-        * 自分の考察した方法`(num <= nums[-1], num)`をkeyに渡していた
+        * 自分の考察した方法: `(num <= nums[-1], num)`をkeyに渡していた
 
 * https://github.com/mamo3gr/arai60/pull/41
     * 上記までの解法と同様
@@ -156,4 +156,109 @@ class Solution:
     * たしかにoffsetを使うやり方は計算の手間が増えている文少し読み手の負担がある
     * 関数に括り出したのはそういう意味では認知負荷の軽減につながっていそう
 
+## 上記を踏まえて別の解法を実装
+
+### Code3-2 (bisect with customized key)
+
+* keyに(num <= nums[-1], num)を渡す方法
+* keyは関数のことを意味しそうだから, `compute_key`よりも`compute_priority`の方がよいかも？？
+
+```python
+import bisect
+
+
+class Solution:
+    def search(self, nums: list[int], target: int) -> int:
+        # rotated array -> corresponding keys
+        # [5, 6, 1, 2] -> [(0, 5), (0, 6), (1, 1), (1, 2)]
+        def compute_key_for_rotated_array(num: int) -> tuple[int, int]:
+            return (num <= nums[-1], num)
+
+        index = bisect.bisect_left(
+            a   = nums, 
+            x   = compute_key_for_rotated_array(target),
+            key = compute_key_for_rotated_array
+        )
+        if nums[index] == target:
+            return index
+        return -1
+        
+
+```
+
+### Code3-3 (bisect with lo and hi)
+
+* minimum_indexを見つけた後に, lo,hiを指定したbisectleftを実行する方法
+
+```python
+import bisect
+
+
+class Solution:
+    def search(self, nums: list[int], target: int) -> int:
+        def is_between_minimum_and_right(num: int) -> bool:
+            return (num <= nums[-1])
+
+        minimum_index = bisect.bisect_left(nums, True, key=is_between_minimum_and_right)
+
+        if is_between_minimum_and_right(target):
+            lo, hi = minimum_index, len(nums)
+        else:
+            lo, hi = 0, minimum_index
+        
+        index = bisect.bisect_left(nums, target, lo, hi)
+        
+        if nums[index] == target:
+            return index
+        return -1
+
+```
+
+### Code3-4 (binary search with complex condition)
+
+* 最小値がどこにあるか、targetがどこにあるかを判定しながら二分探索する方法
+
+```python
+class Solution:
+    def search(self, nums: list[int], target: int) -> int:
+        if not nums:
+            return -1
+
+        left = 0
+        right = len(nums) - 1
+        is_target_after_minimum = target <= nums[-1]
+        while left < right:
+            mid = left + (right - left) // 2
+            
+            if nums[mid] == target:
+                return mid
+
+            is_mid_after_minimum = nums[mid] <= nums[-1]
+
+            if is_mid_after_minimum:
+                if is_target_after_minimum:
+                    if nums[mid] < target:
+                        left = mid + 1
+                    else:
+                        right = mid
+                else:
+                    right = mid - 1
+                continue
+
+            if not is_mid_after_minimum:
+                if is_target_after_minimum:
+                    left = mid + 1
+                else:
+                    if nums[mid] < target:
+                        left = mid + 1
+                    else:
+                        right = mid
+                continue
+        
+        if nums[left] == target:
+            return left
+        return -1
+                
+
+```
 # Step4
