@@ -66,6 +66,8 @@ class Solution:
     * targetが存在しなかった場合の動作
     * offsetがminimumでなかった場合の動作
 * 文章で説明するよりもミニマムな入出力例を出した方がわかりやすいかも
+* offsetとせずに、minimum_indexを起点にしていることが関数名でわかるようにした方がいいかも
+    * `_binary_search_rotated_array`で引数に`minimum_index`をつけるとか
 
 ```python
 class Solution:
@@ -261,4 +263,11 @@ class Solution:
                 
 
 ```
+
 # Step4
+
+## Code4-2 (bisect with customized key)
+
+```python
+
+```
