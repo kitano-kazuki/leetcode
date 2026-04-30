@@ -66,7 +66,7 @@ class Solution:
 
 # Step2
 
-## Code2-2 (Binary Search)
+## Code2-1 (Binary Search)
 
 * `_is_shippable`は二通りの実装がありそう
     * days = D, len(weights) = Nとする
@@ -145,3 +145,57 @@ class Solution:
 * https://github.com/ryoooooory/LeetCode/pull/46#discussion_r2659011235
     * > 私も 10^8-10^9 くらいで見積もりそうですが、しかし、一般にソフトウェアの速度は保守的に見積もったほうがいいんですよね。(予想外に速くて困ることはあまりないが逆は困ることがあるので。)
     * 計算量の見積もりは少し余裕を持った方がいい
+
+## 気になった実装をしてみる
+
+### Code3-2 (Bisect lib)
+
+* `range`は今までジェネレータだと思っていたがそうではなかった.
+* > The advantage of the range type over a regular list or tuple is that a range object will always take the same (small) amount of memory, no matter the size of the range it represents (as it only stores the start, stop and step values, calculating individual items and subranges as needed).
+* > Range objects implement the collections.abc.Sequence ABC, and provide features such as containment tests, element index lookup, slicing and support for negative indices
+
+* `capacity_range = range(min_capacity, max_capacity)`を`capacity_range = list(range(min_capacity, max_capacity))`にするとMemory Limie Exceededになった
+* 500 * 5 * 10^4 * 28 byte ~= 10^8 ~ 10^9 byte ~= 0.1 ~ 1 GB
+    * 厳しくない？？？ MemoryLimitにかかるの1GBとかだと思っていた。厳しい方で見積もって1GBだからMemory Limitにかからない気もしていた
+        * LeetCodeのMemoryLimitが小さい？
+        * 見積もりが違う??
+        * わかる人教えてください
+
+
+```python
+import bisect
+
+
+class Solution:
+    def shipWithinDays(self, weights: list[int], days: int) -> int:
+        if not weights:
+            return -1
+
+        def is_shippable(capacity: int) -> bool:
+            spent_days = 1
+            weights_on_ship = 0
+            for i in range(len(weights)):
+                if weights_on_ship + weights[i] <= capacity:
+                    weights_on_ship += weights[i]
+                    continue
+
+                spent_days += 1
+                if spent_days > days:
+                    return False
+
+                weights_on_ship = weights[i]
+
+            return True
+        
+        min_capacity = max(weights)
+        max_capacity = sum(weights) + 1
+        capacity_range = range(min_capacity, max_capacity)
+        index = bisect.bisect_left(capacity_range, True, key=is_shippable)
+        return capacity_range[index]
+
+
+```
+
+# Step4
+
+##
