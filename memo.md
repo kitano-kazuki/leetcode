@@ -121,3 +121,22 @@ class Solution:
 ```
 
 # Step3
+
+## 他の人のコードを見る
+
+* https://github.com/olsen-blue/Arai60/pull/45
+    * 解法1 - 再帰
+        * `**`を使っているが、なぜ自分の時のようなエラーが出なかったのか疑問.
+        * たまたま通っているだけ？？
+    * 解法2 - ループ（ビット処理）
+        * n > 0である限り, 以前に計算した結果同士をかけてnを2で割る処理を繰り返す
+
+* https://github.com/naoto-iwase/leetcode/pull/46
+    * 同じ`OverflowError`に直面していた
+    * > `power **= 2`の方でもtry-exceptでOverflowErrorをmath.infに置き換えると動いた。
+
+## 他の人のコメントを見る
+
+* https://github.com/hroc135/leetcode/pull/43#discussion_r2002298814
+    * > IEEE-754の内部ビットの数も覚えておくと、面接でよく分かっている風が醸せることがあります。 exponent が8ビットと11ビットです。符号が1ビットで残りが23ビットと52ビットです。
+* https://kazuki.main.jp/?p=8
