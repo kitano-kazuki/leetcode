@@ -112,7 +112,7 @@ class Solution:
 
 ```
 
-# step3
+# Step3
 
 ## 他の人のコードを見る
 
@@ -168,3 +168,5 @@ class Solution:
         return result
                 
 ```
+
+# Step4
