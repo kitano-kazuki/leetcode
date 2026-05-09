@@ -2,7 +2,7 @@ class Solution:
     def myPow(self, x: float, n: int) -> float:
         if n == 0:
             return 1
-        
+
         abs_n = abs(n)
 
         selection_bit = 0b1
