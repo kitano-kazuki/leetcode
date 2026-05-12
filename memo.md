@@ -177,6 +177,31 @@ class Solution:
 ## Code4-1
 
 ```python
+import copy
+
+
+class TreeNode:
+    def __init__(self, val):
+        self.val = val
+        self.left, self.right = None, None
+
+class Solution:
+    def split_b_s_t(self, root: TreeNode, v: int) -> TreeNode:
+
+        def split_bst_helper(root: TreeNode | None) -> tuple[TreeNode | None, TreeNode | None]:
+            if root is None:
+                return None, None
+            
+            if root.val <= v:
+                sub_smaller_root, sub_larger_root = split_bst_helper(root.right)
+                root.right = sub_smaller_root
+                return [root, sub_larger_root]
+            else:
+                sub_smaller_root, sub_larger_root = split_bst_helper(root.left)
+                root.left = sub_larger_root
+                return [sub_smaller_root, root]
+        
+        return split_bst_helper(copy.deepcopy(root))
 
 ```
 
