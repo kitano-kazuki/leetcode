@@ -85,3 +85,51 @@ class Solution:
         return longest_length
 
 ```
+
+# Step3
+
+## 他の人のコード
+
+### olsen-blue : https://github.com/olsen-blue/Arai60/pull/49
+
+* dictを利用して, 前回登場した文字の一つ次のindexにleftを動かすことができる
+    * 定数倍の効率化
+
+### naoto-iwase : https://github.com/naoto-iwase/leetcode/pull/49
+
+* dictやwhileループの代わりに`find`を使用
+
+## 他の人のコメント
+
+* https://github.com/garunitule/coding_practice/pull/47#discussion_r2685035102
+    * > 趣味の範囲ですがここはforで回してもいいかもしれません。
+
+# Step4
+
+## Code4-1
+
+```python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        if not s:
+            return 0
+        
+        left = 0
+        right = 1
+        longest_length = 1
+        chars_in_window = set(s[0])
+
+        while right < len(s):
+            
+            while s[right] in chars_in_window:
+                chars_in_window.remove(s[left])
+                left += 1
+            
+            chars_in_window.add(s[right])
+            right += 1
+            longest_length = max(longest_length, right - left)
+
+        return longest_length
+
+
+```
