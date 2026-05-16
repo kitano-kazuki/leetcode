@@ -94,3 +94,59 @@ class Solution:
         return result
 
 ```
+
+# Step3
+
+## 他の人のコードを見る
+
+### olsen-blue: https://github.com/olsen-blue/Arai60/pull/51
+
+* backtrackでは, 一つのpermutation引数を使い回す
+* 最後の保存する際に, copyしたものを保存する
+
+### naoto-iwase: https://github.com/naoto-iwase/leetcode/pull/51
+
+* backtrackだと, スライスによるオーバーヘッドが乗らない分少しだけ計算量が緩和される
+
+### mamo3gr: https://github.com/mamo3gr/arai60/pull/47
+
+* 計算量はO(N!)ではなくて, O(N * N!)らしい
+* copyをしているからか
+    * 自分の実装は, O(N^2 * N!)
+    *  N!個の配列が長さNでO(N * N!)かかる
+    * 各再帰の段階でコピーをしているので, O(N)分余計にかかる
+
+
+## 追加で実装
+
+### Code3-3 (BackTrack)
+
+* 無駄な配列のコピー(candidateのコピー)がないのでO(N * N!)になった
+
+```python
+class Solution:
+    def permute(self, nums: list[int]) -> list[list[int]]:
+        all_permutations = []
+
+        permutation = []
+        used_indices = set()
+        def generate_permutations() -> None:
+            if len(permutation) == len(nums):
+                all_permutations.append(permutation.copy())
+                return
+
+            for i in range(len(nums)):
+                if i in used_indices:
+                    continue
+                used_indices.add(i)
+                permutation.append(nums[i])
+                generate_permutations()
+                permutation.pop()
+                used_indices.remove(i)
+            return
+        
+        generate_permutations()
+        return all_permutations
+                
+```
+
