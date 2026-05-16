@@ -1,14 +1,12 @@
 class Solution:
     def permute(self, nums: list[int]) -> list[list[int]]:
-        
-
         all_permutations = []
         permutation = []
         used_indices = set()
         def generate_permutations():
             if len(permutation) == len(nums):
                 all_permutations.append(permutation.copy())
-                return
+                return 
             
             for i in range(len(nums)):
                 if i in used_indices:
@@ -21,8 +19,9 @@ class Solution:
 
                 used_indices.remove(i)
                 permutation.pop()
+            
+            return 
         
         generate_permutations()
         return all_permutations
-            
         
