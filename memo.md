@@ -237,3 +237,29 @@ class Solution:
         return max_used
 
 ```
+
+# Step3
+
+## Code3-3 (heap)
+
+* 実際に予約が全部来る前でもリアルタイム的に処理できそうだと思ったので, heapの解法をstep3で実装する
+
+```python
+import heapq
+
+
+class Solution:
+    def minMeetingRooms(self, intervals: list[Interval]) -> int:
+        sorted_intervals = sorted(intervals, key=lambda interval : interval.start)
+
+        release_times = []
+        for interval in sorted_intervals:
+            if release_times and release_times[0] <= interval.start:
+                heapq.heapreplace(release_times, interval.end)
+            else:
+                heapq.heappush(release_times, interval.end)
+        
+        return len(release_times)
+
+```
+
