@@ -110,3 +110,108 @@ class LFUCache:
 ```
 
 # Step2
+
+
+以下に記した小田さんのコメントとnodaさんの実装を参考にもうちょと読みやすくしてみる
+
+---
+
+```
+struct Node {
+  int key;
+  int value;
+  int freqency;
+};
+std::unordered_map<int, std::list<Node>> freq_to_nodes_;
+std::unordered_map<int, std::list<Node>::iterator> key_to_iter_;
+```
+
+でもいけますか。これだと、最小の頻度が追い出されてなくなった時に次の頻度を計算するのが難しそうなのですが、それは実は必ず1です。
+
+---
+
+## Code2-1
+
+* `Node`が`key`, `value`, `frequency`をもつ
+* ある`key`の使用回数が増えた時
+    * `key_to_node`で対応したいもの
+        * その`key`を持つ`Node`が欲しい
+    * `frequency_to_nodes`で対応したいもの
+        * その`Node`の`frequency`と同じ回数使われたノードのリストが欲しい
+        * その`frequency`に`+1`した回数使われたノードのリストが欲しい
+
+```python
+from collections import OrderedDict
+
+
+class Node:
+    def __init__(self, key, value, frequency):
+        self.key = key
+        self.value = value
+        self.frequency = frequency
+
+
+class LFUCache:
+
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.size = 0
+        self.least_frequency = 0
+        self.freq_to_nodes : dict[int, OrderedDict[Node, bool]] = {}
+        self.key_to_node : dict[str, Node] = {}
+
+
+    def _increment_frequency(self, key: int) -> None:
+        node = self.key_to_node[key]
+        freq = node.frequency
+        new_freq = freq + 1
+
+        nodes_in_freq = self.freq_to_nodes[freq]
+
+        del nodes_in_freq[node]
+        if not nodes_in_freq:
+            del self.freq_to_nodes[freq]
+            if freq == self.least_frequency:
+                self.least_frequency = new_freq
+
+        node.frequency = new_freq
+        if new_freq not in self.freq_to_nodes:
+            self.freq_to_nodes[new_freq] = OrderedDict()
+        self.freq_to_nodes[new_freq][node] = True
+
+        return
+
+    def get(self, key: int) -> int:
+        if key not in self.key_to_node:
+            return -1
+        self._increment_frequency(key)
+
+        return self.key_to_node[key].value
+
+
+    def put(self, key: int, value: int) -> None:
+        if key in self.key_to_node:
+            self._increment_frequency(key)
+            self.key_to_node[key].value = value
+            return
+
+        self.size += 1
+
+        if self.size > self.capacity:
+            self.size -= 1
+            nodes_in_least_freq = self.freq_to_nodes[self.least_frequency]
+            node_deleted, _ = nodes_in_least_freq.popitem(last=False)
+            if not nodes_in_least_freq:
+                del self.freq_to_nodes[self.least_frequency]
+            del self.key_to_node[node_deleted.key]
+        
+        self.least_frequency = 1
+        node = Node(key, value, 1)
+        self.key_to_node[key] = node
+        if 1 not in self.freq_to_nodes:
+            self.freq_to_nodes[1] = OrderedDict()
+        self.freq_to_nodes[1][node] = True
+
+        return
+
+```
